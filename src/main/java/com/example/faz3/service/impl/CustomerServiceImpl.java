@@ -198,4 +198,16 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customer> byUsername = repository.findByUsername(username);
         return byUsername;
     }
+
+    @Override
+    public void startJob(String customerUsername, Long OrderId) {
+        Customer customer = findByUsername(customerUsername).get();
+        List<Order> orders = customer.getOrders();
+        for (Order a:orders) {
+            if(a.getId().equals(OrderId)&&a.getStatusOrder()==StatusOrder.ComingTowardsYou){
+                a.setStatusOrder(StatusOrder.Started);
+                orderServiceImpl.update(a);
+            }
+        }
+    }
 }

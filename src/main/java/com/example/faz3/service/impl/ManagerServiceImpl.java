@@ -1,6 +1,8 @@
 package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
+import com.example.faz3.dto.ListRequestExpertDto;
+import com.example.faz3.dto.RequestExpertDto;
 import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
 import com.example.faz3.entity.Expert;
@@ -9,12 +11,14 @@ import com.example.faz3.entity.RequestExpert;
 import com.example.faz3.entity.SubService;
 import com.example.faz3.entity.enu.StatusExpert;
 import com.example.faz3.exception.*;
+import com.example.faz3.mapper.RequestExpertMapper;
 import com.example.faz3.repository.ManagerRepository;
 import com.example.faz3.service.ManagerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +31,7 @@ public class ManagerServiceImpl implements ManagerService {
     private final ExpertServiceImpl expertServiceImpl;
 
     private final RequestExpertServiceImpl requestExpertServiceImpl;
+    RequestExpertMapper requestExpertMapper=new RequestExpertMapper();
 
     @Override
     @Transactional
@@ -114,9 +119,14 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public List<RequestExpert> showRequestExperts() {
+    public ListRequestExpertDto showRequestExperts() {
         List<RequestExpert> list = requestExpertServiceImpl.findStatusWaiting();
-            return list;
+        List<RequestExpertDto> requestExpertDtos=new ArrayList<>();
+        for (RequestExpert r : list){
+            requestExpertDtos.add(requestExpertMapper.convert(r));
+        }
+
+            return new ListRequestExpertDto(requestExpertDtos);
     }
 
     @Override

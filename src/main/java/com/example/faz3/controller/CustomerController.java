@@ -3,6 +3,7 @@ package com.example.faz3.controller;
 import com.example.faz3.dto.CustomerDto;
 import com.example.faz3.dto.OrderDto;
 import com.example.faz3.entity.Customer;
+import com.example.faz3.entity.Expert;
 import com.example.faz3.entity.Order;
 import com.example.faz3.entity.Suggestion;
 import com.example.faz3.service.CustomerService;
@@ -43,6 +44,10 @@ public class CustomerController {
     @PutMapping("/select-Expert/{customerUsername}/{orderId}/{suggestionId}")
     public void selectExpert(@PathVariable String customerUsername,@PathVariable Long orderId,@PathVariable Long suggestionId) {
         customerService.selectExpert(customerUsername, orderId, suggestionId);
+    }
+    @PutMapping("/startJob/{customerUsername}/{OrderId}")
+    public void startJob(@PathVariable String customerUsername,@PathVariable Long OrderId){
+        customerService.startJob(customerUsername,OrderId);
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.faz3.controller;
 
+import com.example.faz3.dto.ListRequestExpertDto;
 import com.example.faz3.dto.addExpertToSubService;
 import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
@@ -54,7 +55,7 @@ public class ManagerController {
     }
 
     @PutMapping("/change-title-subservice/{id}/{newTitle}")
-    List<String> changeTitleSubService(@PathVariable Long id, @PathVariable String newTitle) {
+    List<String> changeTitleSubService(@PathVariable Long id, @PathVariable String newTitle) {//
         managerService.changeTitleSubService(id, newTitle);
         List<String> list = new ArrayList<>();
         list.add("A");
@@ -63,7 +64,7 @@ public class ManagerController {
     }
 
     @GetMapping ("/show-Request-Experts")
-    public List<RequestExpert> showRequestExperts() {
+    public ListRequestExpertDto showRequestExperts() {
         return managerService.showRequestExperts();
     }
 

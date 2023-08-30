@@ -13,12 +13,20 @@ import org.springframework.stereotype.Service;
 @Component
 @RequiredArgsConstructor
 public class RequestExpertMapper {
-    private final SubServiceService subServiceService;
-    private final ExpertService expertService;
-    public RequestExpert convert(RequestExpertDto requestExpertDto){
-        RequestExpert requestExpert=new RequestExpert();
-        requestExpert.setExpert(expertService.findByUsername(requestExpertDto.getExpertUsername()).get());
-        requestExpert.setSubService(subServiceService.findByTitle(requestExpertDto.getSubServiceTitle()).get());
+//    private final SubServiceService subServiceService;
+//    private final ExpertService expertService;
+
+    public RequestExpert convert(RequestExpertDto requestExpertDto) {
+        RequestExpert requestExpert = new RequestExpert();
+//        requestExpert.setExpert(expertService.findByUsername(requestExpertDto.getExpertUsername()).get());
+//        requestExpert.setSubService(subServiceService.findByTitle(requestExpertDto.getSubServiceTitle()).get());
         return requestExpert;
+    }
+
+    public RequestExpertDto convert(RequestExpert requestExpert) {
+        RequestExpertDto requestExpertDto = new RequestExpertDto();
+        requestExpertDto.setExpertUsername(requestExpert.getExpert().getUsername());
+        requestExpertDto.setSubServiceTitle(requestExpert.getSubService().getTitle());
+        return requestExpertDto;
     }
 }

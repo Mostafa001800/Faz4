@@ -21,6 +21,7 @@ public interface CustomerService {
     void startWork(Customer customer, int orderId);
     boolean checkStartDate(Customer customer, int orderId);
     Optional<Customer> findByUsername(String username);
+    void startJob(String customerUsername, Long OrderId);
 
 
 

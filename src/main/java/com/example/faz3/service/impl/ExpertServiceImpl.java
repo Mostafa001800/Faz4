@@ -138,18 +138,6 @@ public class ExpertServiceImpl implements ExpertService {
         suggestionServiceImpl.save(suggestion);
     }
 
-    @Override
-    @Transactional
-    public void startJob(Expert expert, Long wordId) {
-        Boolean test = false;
-
-        Order order = orderServiceImpl.findById(wordId).get();
-        if (order.getExpert() == expert) {
-            order.setStatusOrder(StatusOrder.Started);
-            orderServiceImpl.save(order);
-        } else
-            throw new WrongException("You are not responsible for doing this");
-    }
 
     @Override
     @Transactional

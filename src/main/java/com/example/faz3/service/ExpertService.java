@@ -16,7 +16,6 @@ public interface ExpertService {
     public void singUp(ExpertDto expertDto);
     public void saveImage(Expert expert, String location);
     public void registerTheOffer(SuggestionDto suggestionDto);
-    public void startJob(Expert expert, Long wordId);
     public void requestExpert(RequestExpertDto requestExpertDto);
     public Optional<Expert> findById(Long id);
     public Optional<Expert> findByUsername(String user);

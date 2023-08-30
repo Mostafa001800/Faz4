@@ -1,5 +1,6 @@
 package com.example.faz3.service;
 
+import com.example.faz3.dto.ListRequestExpertDto;
 import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
 import com.example.faz3.entity.Manager;
@@ -17,7 +18,7 @@ public interface ManagerService {
     void changeTitleService(Long id, String newTitle);
     void changeTitleSubService(Long id, String newTitle);
     void changeStatusRequestExpert(Long requestExpertId, Long statusExpert);
-    List<RequestExpert> showRequestExperts();
+    ListRequestExpertDto showRequestExperts();
     void changeBasePrice(Long id, double newPrice);
     void removeSubService(Long id);
     void addSubService(SubServiceDto subServiceDto);
