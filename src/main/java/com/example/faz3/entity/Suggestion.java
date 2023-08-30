@@ -29,7 +29,7 @@ public class Suggestion extends BaseEntity<Long> {
     @Override
     public String toString() {
         return "Suggestion{" +
-                "expert=" + expert +
+                "expert=" + expert.getUsername() +
                 ", order=" + order.getId() +
                 ", date=" + date +
                 ", price=" + price +

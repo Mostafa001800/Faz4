@@ -34,5 +34,11 @@ public class CustomerController {
         System.out.println(suggestions);
         return null;
     }
+    @GetMapping("/show-SuggestionByScore/{orderId}")
+    public List<Suggestion> showSuggestionByScore(@PathVariable Long orderId) {
+        List<Suggestion> suggestions = customerService.showSuggestionByScore(orderId);
+        System.out.println(suggestions);
+        return null;
+    }
 
 }
