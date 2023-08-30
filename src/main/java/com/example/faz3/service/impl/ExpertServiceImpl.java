@@ -2,11 +2,13 @@ package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
 import com.example.faz3.dto.RequestExpertDto;
+import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.exception.*;
 import com.example.faz3.mapper.ExpertMapper;
+import com.example.faz3.mapper.SuggestionMapper;
 import com.example.faz3.repository.ExpertRepository;
 import com.example.faz3.service.*;
 import jakarta.transaction.Transactional;
@@ -29,6 +31,7 @@ public class ExpertServiceImpl implements ExpertService {
     private final SubServiceServiceImpl subServiceServiceImpl;
     private final OrderServiceImpl orderServiceImpl;
     private final RequestExpertServiceImpl requestExpertServiceImpl;
+    private final SuggestionMapper suggestionMapper;
     ExpertMapper expertMapper = new ExpertMapper();
 
 
@@ -68,7 +71,10 @@ public class ExpertServiceImpl implements ExpertService {
         List<Order> All = orderServiceImpl.findAll();
         for (SubService subService : subServices) {
             for (Order order : All) {
-                if (order.getSubService().getId() == subService.getId() && (order.getStatusOrder() == StatusOrder.ExpertSuggestions || order.getStatusOrder() == StatusOrder.ExpertSelection)) {
+                if (order.getSubService() == subService
+                        && (order.getStatusOrder() == StatusOrder.ExpertSuggestions
+                              ||  order.getStatusOrder() == StatusOrder.ExpertSelection)
+                                ) {
                     orders.add(order);
                 }
             }
@@ -119,12 +125,16 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     @Transactional
-    public void RegisterTheTOffer(Suggestion suggestion) {
-        if (suggestion.getOrder().getStatusOrder() == StatusOrder.ExpertSuggestions) {
-            Order order = suggestion.getOrder();
-            order.setStatusOrder(StatusOrder.ExpertSelection);
-            orderServiceImpl.save(order);
-        }
+    public void registerTheOffer(SuggestionDto suggestionDto) {
+        Suggestion suggestion = suggestionMapper.convert(suggestionDto);
+        suggestion.setExpert(findByUsername(suggestionDto.getExpertUsername()).get());
+        suggestion.setOrder(orderServiceImpl.findById(suggestionDto.getOrderId()).get());
+//        Suggestion suggestion = suggestionMapper.convert(suggestionDto);
+//        if (suggestion.getOrder().getStatusOrder() == StatusOrder.ExpertSuggestions) {
+//            Order order = suggestion.getOrder();
+//            order.setStatusOrder(StatusOrder.ExpertSelection);
+//            orderServiceImpl.save(order);
+//        }
         suggestionServiceImpl.save(suggestion);
     }
 

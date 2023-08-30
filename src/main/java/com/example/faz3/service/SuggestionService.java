@@ -1,5 +1,6 @@
 package com.example.faz3.service;
 
+import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.entity.Suggestion;
 
 public interface SuggestionService {

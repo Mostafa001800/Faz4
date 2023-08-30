@@ -1,24 +1,30 @@
 package com.example.faz3.service.impl;
 
+import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.entity.Suggestion;
 import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.exception.SaveException;
+import com.example.faz3.mapper.SuggestionMapper;
 import com.example.faz3.repository.SuggestionRepository;
+import com.example.faz3.service.ExpertService;
+import com.example.faz3.service.OrderService;
 import com.example.faz3.service.SuggestionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
     private final SuggestionRepository repository;
 
-    public SuggestionServiceImpl(SuggestionRepository repository) {
-        this.repository = repository;
-    }
+    SuggestionMapper suggestionMapper=new SuggestionMapper();
 
     @Override
     public void save(Suggestion suggestion) {
+//        Suggestion suggestion = suggestionMapper.convert(suggestionDto);
+//        suggestion.setExpert(expertService.findByUsername(suggestionDto.getExpertUsername()).get());
+//        suggestion.setOrder(orderService.findById(suggestionDto.getOrderId()).get());
         if (duplicateRequest(suggestion) == false)
             if (checkPrice(suggestion) == false) {
                 if (checkDate(suggestion) == false) {
@@ -50,7 +56,7 @@ public class SuggestionServiceImpl implements SuggestionService {
     @Override
     public boolean checkPrice(Suggestion suggestion) {
         boolean test = false;
-        if (suggestion.getPrice() > suggestion.getOrder().getSubService().getBasePrice()) {
+        if (suggestion.getPrice() < suggestion.getOrder().getSubService().getBasePrice()) {
             test = true;
         }
         return test;
@@ -67,9 +73,9 @@ public class SuggestionServiceImpl implements SuggestionService {
 
     @Override
     public boolean checkStatusOrder(Suggestion suggestion) {
-        boolean test = false;
+        boolean test = true;
         if (suggestion.getOrder().getStatusOrder() == StatusOrder.ExpertSuggestions || suggestion.getOrder().getStatusOrder() == StatusOrder.ExpertSelection) {
-            test = true;
+            test = false;
         }
         return test;
     }

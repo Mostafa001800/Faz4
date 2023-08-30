@@ -1,11 +1,10 @@
 package com.example.faz3.service;
 
 import com.example.faz3.dto.RequestExpertDto;
+import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
 import com.example.faz3.entity.Expert;
 import com.example.faz3.entity.Order;
-import com.example.faz3.entity.RequestExpert;
-import com.example.faz3.entity.Suggestion;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,7 @@ public interface ExpertService {
     public void chanelPassword(Expert expert, String pass);
     public void singUp(ExpertDto expertDto);
     public void saveImage(Expert expert, String location);
-    public void RegisterTheTOffer(Suggestion suggestion);
+    public void registerTheOffer(SuggestionDto suggestionDto);
     public void startJob(Expert expert, Long wordId);
     public void requestExpert(RequestExpertDto requestExpertDto);
     public Optional<Expert> findById(Long id);
