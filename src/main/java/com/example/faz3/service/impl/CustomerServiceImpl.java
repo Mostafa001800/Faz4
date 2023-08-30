@@ -86,9 +86,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Suggestion> showSuggestionByPrice(Order order) {
+    public List<Suggestion> showSuggestionByPrice(Long orderId) {
+        Order order = orderServiceImpl.findById(orderId).get();
         List<Suggestion> suggestions = order.getSuggestion();
-        Collections.sort(suggestions, (s1, s2) -> Double.compare(s1.getPrice(), s2.getPrice()));
+        Collections.sort(suggestions,Comparator.comparing(Suggestion::getPrice));
         return suggestions;
     }
 

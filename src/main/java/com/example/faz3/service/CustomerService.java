@@ -15,7 +15,7 @@ public interface CustomerService {
     void registerOrder(OrderDto orderDto);
     void chanelPassword(Customer customer, String pass);
     void singUp(CustomerDto customerDto);
-    List<Suggestion> showSuggestionByPrice(Order order);
+    List<Suggestion> showSuggestionByPrice(Long orderId);
     List<Suggestion> showSuggestionByScore(Order order);
     void selectExpert(Customer customer, int orderId, int suggestionId);
     void startWork(Customer customer, int orderId);
