@@ -102,22 +102,53 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void selectExpert(Customer customer, int orderId, int suggestionId) {
-        if (customer.getOrders().size() > orderId) {
-            if (customer.getOrders().get(orderId).getSuggestion().size() > suggestionId) {
-                Order order = orderServiceImpl.findById(customer.getOrders().get(orderId).getId()).get();
-                Expert expert = expertServiceImpl.findById(customer.getOrders().get(orderId).getSuggestion().get(suggestionId).getId()).get();
-                order.setExpert(expert);
-                order.setStatusOrder(StatusOrder.ComingTowardsYou);
-                orderServiceImpl.save(order);
-            } else {
-                throw new NotFoundException("You entered the wrong number suggestionId");
-            }
-        } else {
-            throw new NotFoundException("You entered the wrong number orderId");
-        }
-    }
+    public void selectExpert(String customerUsername, Long orderId, Long suggestionId) {
+        Customer customer = findByUsername(customerUsername).get();
+//        if (customer.getOrders().size() > orderId) {
+//            if (customer.getOrders().get(orderId).getSuggestion().size() > suggestionId) {
+//                Order order = orderServiceImpl.findById(customer.getOrders().get(orderId).getId()).get();
+//                Expert expert = expertServiceImpl.findById(customer.getOrders().get(orderId).getSuggestion().get(suggestionId).getId()).get();
+//                order.setExpert(expert);
+//                order.setStatusOrder(StatusOrder.ComingTowardsYou);
+//                orderServiceImpl.save(order);
+//            } else {
+//                throw new NotFoundException("You entered the wrong number suggestionId");
+//            }
+//        } else {
+//            throw new NotFoundException("You entered the wrong number orderId");
+//        }
 
+
+//        if(checkOrder(customer,orderId,suggestionId)==true){
+//            Order order = orderServiceImpl.findById(customer.getOrders().get(orderId).getId()).get();
+//            Expert expert = expertServiceImpl.findById(customer.getOrders().get(orderId).getSuggestion().get(suggestionId).getId()).get();
+//            order.setExpert(expert);
+//            order.setStatusOrder(StatusOrder.ComingTowardsYou);
+//            orderServiceImpl.save(order);
+//        } else {
+//            throw new NotFoundException("You entered the wrong number orderId or suggestionId");
+//        }
+
+        List<Order> orders = customer.getOrders();
+        for (Order a:orders) {
+            if(a.getId().equals(orderId)&&a.getStatusOrder()==StatusOrder.ExpertSelection){
+                List<Suggestion> listSuggestion = a.getSuggestion();
+                System.out.println("ok");
+                for (Suggestion s:listSuggestion) {
+                    System.out.println("-ok");
+                    if(s.getId().equals(suggestionId)){
+                        System.out.println("--ok");
+                        a.setExpert(s.getExpert());
+                        a.setStatusOrder(StatusOrder.ComingTowardsYou);
+                        orderServiceImpl.update(a);
+                    }
+                }
+            }
+        }
+
+
+
+    }
     @Override
     public void startWork(Customer customer, int orderId) {
         if (customer.getOrders().size() > orderId) {

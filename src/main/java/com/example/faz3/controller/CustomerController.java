@@ -40,5 +40,12 @@ public class CustomerController {
         System.out.println(suggestions);
         return null;
     }
+    @PutMapping("/select-Expert/{customerUsername}/{orderId}/{suggestionId}")
+    public void selectExpert(@PathVariable String customerUsername,@PathVariable Long orderId,@PathVariable Long suggestionId) {
+        customerService.selectExpert(customerUsername, orderId, suggestionId);
+    }
+
+
+
 
 }

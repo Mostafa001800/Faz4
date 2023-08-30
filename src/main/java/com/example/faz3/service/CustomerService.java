@@ -17,7 +17,7 @@ public interface CustomerService {
     void singUp(CustomerDto customerDto);
     List<Suggestion> showSuggestionByPrice(Long orderId);
     List<Suggestion> showSuggestionByScore(Long orderId);
-    void selectExpert(Customer customer, int orderId, int suggestionId);
+    void selectExpert(String customerUsername, Long orderId, Long suggestionId);
     void startWork(Customer customer, int orderId);
     boolean checkStartDate(Customer customer, int orderId);
     Optional<Customer> findByUsername(String username);
