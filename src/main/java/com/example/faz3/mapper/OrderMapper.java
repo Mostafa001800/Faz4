@@ -12,4 +12,12 @@ public class OrderMapper {
         order.setSuggestedPrice(orderDto.getSuggestedPrice());
         return order;
     }
+    public OrderDto convert(Order order){
+        OrderDto orderDto=new OrderDto();
+        orderDto.setTitle(order.getTitle());
+        orderDto.setDate(order.getDate());
+        orderDto.setAddress(order.getAddress());
+        orderDto.setSuggestedPrice(order.getSuggestedPrice());
+        return orderDto;
+    }
 }

@@ -20,6 +20,7 @@ import com.example.faz3.service.SubServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -207,6 +208,32 @@ public class CustomerServiceImpl implements CustomerService {
             if(a.getId().equals(OrderId)&&a.getStatusOrder()==StatusOrder.ComingTowardsYou){
                 a.setStatusOrder(StatusOrder.Started);
                 orderServiceImpl.update(a);
+            }
+        }
+    }
+    @Override
+    public void endJob(String customerUsername, Long OrderId) {
+        Customer customer = findByUsername(customerUsername).get();
+        List<Order> orders = customer.getOrders();
+        boolean test;
+        for (Order a:orders) {
+            if(a.getId().equals(OrderId)&&a.getStatusOrder()==StatusOrder.Started){
+                a.setStatusOrder(StatusOrder.Done);
+                orderServiceImpl.update(a);
+
+                Duration duration=Duration.between(a.getDate(),LocalDateTime.now());
+                long days = duration.toDays();
+                long hours = duration.toHours() % 24;
+                long minutes = duration.toMinutes() % 60;
+                long delay=(minutes+(hours*60)+(days*1440))/30;
+
+                Expert expert=a.getExpert();        //update Score
+                expert.setScore(expert.getScore()-(delay*0.1));
+                if(expert.getScore()<=0){
+                    expert.getSubServices().clear();
+                }
+                expertServiceImpl.update(expert);
+                System.out.println(expert.getSubServices());
             }
         }
     }

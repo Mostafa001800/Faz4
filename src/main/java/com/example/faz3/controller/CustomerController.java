@@ -50,6 +50,11 @@ public class CustomerController {
         customerService.startJob(customerUsername,OrderId);
     }
 
+    @PutMapping("/endJob/{customerUsername}/{OrderId}")
+    public void endJob(@PathVariable String customerUsername,@PathVariable Long OrderId){
+        customerService.endJob(customerUsername,OrderId);
+    }
+
 
 
 

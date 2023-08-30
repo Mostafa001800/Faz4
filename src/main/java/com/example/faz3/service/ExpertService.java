@@ -1,5 +1,6 @@
 package com.example.faz3.service;
 
+import com.example.faz3.dto.ListOrderDto;
 import com.example.faz3.dto.RequestExpertDto;
 import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 public interface ExpertService {
     public Optional<Expert> login(String user, String pass);
-    public List<Order> works(Expert expert);
+    public ListOrderDto works(Expert expert);
     public void chanelPassword(Expert expert, String pass);
     public void singUp(ExpertDto expertDto);
     public void saveImage(Expert expert, String location);

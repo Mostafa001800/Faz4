@@ -1,5 +1,6 @@
 package com.example.faz3.controller;
 
+import com.example.faz3.dto.ListOrderDto;
 import com.example.faz3.dto.RequestExpertDto;
 import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
@@ -29,10 +30,10 @@ public class ExpertController {
     }
 
     @GetMapping("/my-work/{expertUsername}")
-    public int works(@PathVariable String expertUsername) {
+    public ListOrderDto works(@PathVariable String expertUsername) {
         Expert expert = expertService.findByUsername(expertUsername).get();
-        List<Order> works = expertService.works(expert);
-        return works.size();
+        ListOrderDto works = expertService.works(expert);
+        return works;
     }
 
     @PostMapping("/registertheoffer")

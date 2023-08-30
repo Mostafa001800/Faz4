@@ -1,6 +1,8 @@
 package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
+import com.example.faz3.dto.ListOrderDto;
+import com.example.faz3.dto.OrderDto;
 import com.example.faz3.dto.RequestExpertDto;
 import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
@@ -8,6 +10,7 @@ import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.exception.*;
 import com.example.faz3.mapper.ExpertMapper;
+import com.example.faz3.mapper.OrderMapper;
 import com.example.faz3.mapper.SuggestionMapper;
 import com.example.faz3.repository.ExpertRepository;
 import com.example.faz3.service.*;
@@ -33,6 +36,7 @@ public class ExpertServiceImpl implements ExpertService {
     private final RequestExpertServiceImpl requestExpertServiceImpl;
     private final SuggestionMapper suggestionMapper;
     ExpertMapper expertMapper = new ExpertMapper();
+    OrderMapper orderMapper=new OrderMapper();
 
 
 //    @Autowired
@@ -65,8 +69,9 @@ public class ExpertServiceImpl implements ExpertService {
     }
 
     @Override
-    public List<Order> works(Expert expert) {
-        List<Order> orders = new ArrayList<>();
+    public ListOrderDto works(Expert expert) {
+//        List<Order> orders = new ArrayList<>();
+        List<OrderDto> listOrderDto=new ArrayList<>();
         List<SubService> subServices = expert.getSubServices();
         List<Order> All = orderServiceImpl.findAll();
         for (SubService subService : subServices) {
@@ -75,11 +80,11 @@ public class ExpertServiceImpl implements ExpertService {
                         && (order.getStatusOrder() == StatusOrder.ExpertSuggestions
                               ||  order.getStatusOrder() == StatusOrder.ExpertSelection)
                                 ) {
-                    orders.add(order);
+                    listOrderDto.add(orderMapper.convert(order));
                 }
             }
         }
-        return orders;
+        return new ListOrderDto(listOrderDto);
     }
 
     @Override
