@@ -49,4 +49,8 @@ public class ExpertController {
         return expert.getSubServices();
     }
 
+    @GetMapping("/showScore/{expertUsername}")
+    public double showScore(@PathVariable String expertUsername) {
+        return expertService.showScore(expertUsername);
+    }
 }

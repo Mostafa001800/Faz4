@@ -135,11 +135,11 @@ public class ExpertServiceImpl implements ExpertService {
         suggestion.setExpert(findByUsername(suggestionDto.getExpertUsername()).get());
         suggestion.setOrder(orderServiceImpl.findById(suggestionDto.getOrderId()).get());
 //        Suggestion suggestion = suggestionMapper.convert(suggestionDto);
-//        if (suggestion.getOrder().getStatusOrder() == StatusOrder.ExpertSuggestions) {
-//            Order order = suggestion.getOrder();
-//            order.setStatusOrder(StatusOrder.ExpertSelection);
-//            orderServiceImpl.save(order);
-//        }
+        if (suggestion.getOrder().getStatusOrder() == StatusOrder.ExpertSuggestions) {
+            Order order = suggestion.getOrder();
+            order.setStatusOrder(StatusOrder.ExpertSelection);
+            orderServiceImpl.save(order);
+        }
         suggestionServiceImpl.save(suggestion);
     }
 
@@ -150,7 +150,6 @@ public class ExpertServiceImpl implements ExpertService {
         RequestExpert requestExpert = new RequestExpert();
         requestExpert.setExpert(findByUsername(requestExpertDto.getExpertUsername()).get());
         requestExpert.setSubService(subServiceServiceImpl.findByTitle(requestExpertDto.getSubServiceTitle()).get());
-
         requestExpertServiceImpl.save(requestExpert);
     }
 
@@ -183,5 +182,25 @@ public class ExpertServiceImpl implements ExpertService {
     @Override
     public void update(Expert expert) {
         repository.save(expert);
+    }
+
+    @Override
+    public void updateScore(Comment comment) {
+        Expert expert = comment.getOrder().getExpert();
+        expert.setScore(expert.getScore()+comment.getScore());
+    }
+
+    @Override
+    public double showScore(String expertUsername) {
+        Optional<Expert> expert = findByUsername(expertUsername);
+        if(expert.isEmpty()){
+            throw new NotFoundException("Not Found Expert");
+        }
+        return expert.get().getScore();
+    }
+
+    @Override
+    public List<Expert> findAll() {
+        return repository.findAll();
     }
 }

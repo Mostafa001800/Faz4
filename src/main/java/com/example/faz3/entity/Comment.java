@@ -2,6 +2,7 @@ package com.example.faz3.entity;
 
 import com.example.faz3.base.domain.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +17,7 @@ import lombok.experimental.FieldDefaults;
 public class Comment extends BaseEntity<Long> {
     @OneToOne
 //    @JoinColumn(name = "Order_id", referencedColumnName = "id")
-    Order Order;
-    int Score;
+    Order order;
+    int score;
     String title;
 }

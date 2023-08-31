@@ -1,22 +1,22 @@
 package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
+import com.example.faz3.dto.CommentDto;
 import com.example.faz3.dto.CustomerDto;
+import com.example.faz3.dto.InputJobDto;
 import com.example.faz3.dto.OrderDto;
-import com.example.faz3.entity.Customer;
-import com.example.faz3.entity.Expert;
-import com.example.faz3.entity.Order;
-import com.example.faz3.entity.Suggestion;
+import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
-import com.example.faz3.exception.InputeException;
-import com.example.faz3.exception.InvalidPasswordException;
-import com.example.faz3.exception.NotFoundException;
-import com.example.faz3.exception.WrongException;
+import com.example.faz3.exception.*;
+import com.example.faz3.mapper.CommentMapper;
 import com.example.faz3.mapper.CustomerMapper;
 import com.example.faz3.mapper.OrderMapper;
 import com.example.faz3.repository.CustomerRepository;
+import com.example.faz3.service.CommentService;
 import com.example.faz3.service.CustomerService;
 import com.example.faz3.service.SubServiceService;
+import com.example.faz3.service.SuggestionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +31,11 @@ public class CustomerServiceImpl implements CustomerService {
     private final OrderServiceImpl orderServiceImpl;
     private final ExpertServiceImpl expertServiceImpl;
     private final SubServiceService subServiceService;
+    private final SuggestionService suggestionService;
+    private final CommentService commentService;
     CustomerMapper customerMapper = new CustomerMapper();
-    OrderMapper orderMapper=new OrderMapper();
+    OrderMapper orderMapper = new OrderMapper();
+    CommentMapper commentMapper = new CommentMapper();
 
     @Override
     public Optional<Customer> Login(String user, String pass) {
@@ -90,7 +93,7 @@ public class CustomerServiceImpl implements CustomerService {
     public List<Suggestion> showSuggestionByPrice(Long orderId) {
         Order order = orderServiceImpl.findById(orderId).get();
         List<Suggestion> suggestions = order.getSuggestion();
-        Collections.sort(suggestions,Comparator.comparing(Suggestion::getPrice));
+        Collections.sort(suggestions, Comparator.comparing(Suggestion::getPrice));
         return suggestions;
     }
 
@@ -131,25 +134,27 @@ public class CustomerServiceImpl implements CustomerService {
 //        }
 
         List<Order> orders = customer.getOrders();
-        for (Order a:orders) {
-            if(a.getId().equals(orderId)&&a.getStatusOrder()==StatusOrder.ExpertSelection){
-                List<Suggestion> listSuggestion = a.getSuggestion();
+        for (Order order : orders) {
+            if (order.getId().equals(orderId) && order.getStatusOrder() == StatusOrder.ExpertSelection) {
+                List<Suggestion> listSuggestion = order.getSuggestion();
                 System.out.println("ok");
-                for (Suggestion s:listSuggestion) {
+                for (Suggestion s : listSuggestion) {
                     System.out.println("-ok");
-                    if(s.getId().equals(suggestionId)){
+                    if (s.getId().equals(suggestionId)) {
                         System.out.println("--ok");
-                        a.setExpert(s.getExpert());
-                        a.setStatusOrder(StatusOrder.ComingTowardsYou);
-                        orderServiceImpl.update(a);
+                        order.setExpert(s.getExpert());
+                        order.setStatusOrder(StatusOrder.ComingTowardsYou);
+                        orderServiceImpl.update(order);
+                        s.setAccepted(true);
+                        suggestionService.save(s);
                     }
                 }
             }
         }
 
 
-
     }
+
     @Override
     public void startWork(Customer customer, int orderId) {
         if (customer.getOrders().size() > orderId) {
@@ -190,7 +195,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void registerOrder(OrderDto orderDto) {
         Order order = orderMapper.convert(orderDto);
         order.setCustomer(findByUsername(orderDto.getCustomerUsername()).get());
-        order.setSubService(subServiceService.findByTitle("PlasterWork").get());
+        order.setSubService(subServiceService.findByTitle(orderDto.getSubServiceId()).get());
         orderServiceImpl.save(order);
     }
 
@@ -204,32 +209,34 @@ public class CustomerServiceImpl implements CustomerService {
     public void startJob(String customerUsername, Long OrderId) {
         Customer customer = findByUsername(customerUsername).get();
         List<Order> orders = customer.getOrders();
-        for (Order a:orders) {
-            if(a.getId().equals(OrderId)&&a.getStatusOrder()==StatusOrder.ComingTowardsYou){
+        for (Order a : orders) {
+            if (a.getId().equals(OrderId) && a.getStatusOrder() == StatusOrder.ComingTowardsYou) {
                 a.setStatusOrder(StatusOrder.Started);
+                a.setDate(LocalDateTime.now());
                 orderServiceImpl.update(a);
             }
         }
     }
+
     @Override
     public void endJob(String customerUsername, Long OrderId) {
         Customer customer = findByUsername(customerUsername).get();
         List<Order> orders = customer.getOrders();
         boolean test;
-        for (Order a:orders) {
-            if(a.getId().equals(OrderId)&&a.getStatusOrder()==StatusOrder.Started){
+        for (Order a : orders) {
+            if (a.getId().equals(OrderId) && a.getStatusOrder() == StatusOrder.Started) {
                 a.setStatusOrder(StatusOrder.Done);
                 orderServiceImpl.update(a);
 
-                Duration duration=Duration.between(a.getDate(),LocalDateTime.now());
+                Duration duration = Duration.between(a.getDate(), LocalDateTime.now());
                 long days = duration.toDays();
                 long hours = duration.toHours() % 24;
                 long minutes = duration.toMinutes() % 60;
-                long delay=(minutes+(hours*60)+(days*1440))/30;
+                long delay = (minutes + (hours * 60) + (days * 1440)) / 30;
 
-                Expert expert=a.getExpert();        //update Score
-                expert.setScore(expert.getScore()-(delay*0.1));
-                if(expert.getScore()<=0){
+                Expert expert = a.getExpert();        //update Score
+                expert.setScore(expert.getScore() - (delay * 0.1));
+                if (expert.getScore() <= 0) {
                     expert.getSubServices().clear();
                 }
                 expertServiceImpl.update(expert);
@@ -237,4 +244,87 @@ public class CustomerServiceImpl implements CustomerService {
             }
         }
     }
+
+    @Override
+    public String CashPayment(InputJobDto inputJobDto) {
+        Optional<Customer> customer = findByUsername(inputJobDto.getCustomerUsername());
+        if (customer.isEmpty()) {
+            throw new NotFoundException("* not found Customer *");
+        }
+        Optional<Order> order = orderServiceImpl.findById(inputJobDto.getOrderId());
+        if (order.isEmpty() && order.get().getCustomer() != customer.get()) {
+            throw new NotFoundException("* not found Order *");
+        }
+        if (order.get().getStatusOrder() != StatusOrder.Done) {
+            throw new WrongException("* The order is not in proper condition *");
+        }
+
+        Suggestion suggestion = new Suggestion();
+        List<Suggestion> listSuggestion = order.get().getSuggestion();
+        for (Suggestion s : listSuggestion) {
+            if (s.isAccepted() == true) {
+                suggestion = s;
+            }
+        }
+        if (customer.get().getValet() <= suggestion.getPrice()) {
+            throw new PaymentException("*Inventory is low *");
+        }
+        Expert expert = suggestion.getExpert();
+
+        customer.get().setValet((customer.get().getValet()) - (suggestion.getPrice()));
+        order.get().setStatusOrder(StatusOrder.Payment);
+        expert.setValet(expert.getValet() + ((suggestion.getPrice() / 100) * 70));
+        expertServiceImpl.update(expert);
+        orderServiceImpl.update(order.get());
+        repository.save(customer.get());
+        return "Success";
+
+//        List<Order> orders = customer.getOrders();
+//        Suggestion suggestion = new Suggestion();
+//        for (Order a : orders) {
+//            if (a.getId().equals(OrderId) && a.getStatusOrder() == StatusOrder.Done) {
+//                for (Suggestion s : a.getSuggestion()) {
+//                    if (s.isAccept() == true) {
+//                        suggestion = s;
+//                    }
+//                }
+//            }
+//        }
+//        if (customer.getValet() >= suggestion.getPrice()) {
+//            customer.setValet(customer.getValet() - suggestion.getPrice());
+//            a.setStatusOrder(StatusOrder.Done);
+//            orderServiceImpl.update(a);
+//        }
+
+    }
+
+    @Transactional
+    @Override
+    public void registerComment(CommentDto commentDto) {
+        Comment comment = commentMapper.convert(commentDto);
+        Optional<Customer> customer = findByUsername(commentDto.getCustomerUsername());
+        if (customer.isEmpty()) {
+            throw new NotFoundException("* not found Customer *");
+        }
+        Optional<Order> order = orderServiceImpl.findById(commentDto.getOrderId());
+        if (order.isEmpty() && order.get().getCustomer() != customer.get()) {
+            throw new NotFoundException("* not found Order *");
+        }
+        if (order.get().getStatusOrder() != StatusOrder.Payment) {
+            throw new WrongException("* The order is not in proper condition *");
+        }
+        comment.setOrder(order.get());
+        commentService.save(comment);
+        expertServiceImpl.updateScore(comment);
+
+
+        order.get().setComment(comment);
+        orderServiceImpl.update(order.get());
+    }
+
+    @Override
+    public List<Customer> finAll() {
+        return repository.findAll();
+    }
 }
+

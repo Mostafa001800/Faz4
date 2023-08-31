@@ -1,18 +1,17 @@
 package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
-import com.example.faz3.dto.ListRequestExpertDto;
-import com.example.faz3.dto.RequestExpertDto;
+import com.example.faz3.dto.*;
 import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
-import com.example.faz3.entity.Expert;
-import com.example.faz3.entity.Manager;
-import com.example.faz3.entity.RequestExpert;
-import com.example.faz3.entity.SubService;
+import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusExpert;
 import com.example.faz3.exception.*;
+import com.example.faz3.filter.CustomerFilter;
+import com.example.faz3.filter.ExpertFilter;
 import com.example.faz3.mapper.RequestExpertMapper;
 import com.example.faz3.repository.ManagerRepository;
+import com.example.faz3.service.CustomerService;
 import com.example.faz3.service.ManagerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +28,11 @@ public class ManagerServiceImpl implements ManagerService {
     private final SubServiceServiceImpl subServiceServiceImpl;
     private final ServiceServiceImpl serviceServiceImpl;
     private final ExpertServiceImpl expertServiceImpl;
-
+    private final CustomerService customerService;
     private final RequestExpertServiceImpl requestExpertServiceImpl;
-    RequestExpertMapper requestExpertMapper=new RequestExpertMapper();
+    RequestExpertMapper requestExpertMapper = new RequestExpertMapper();
+    CustomerFilter customerFilter = new CustomerFilter();
+    ExpertFilter expertFilter=new ExpertFilter();
 
     @Override
     @Transactional
@@ -40,18 +41,34 @@ public class ManagerServiceImpl implements ManagerService {
         Expert expert = expertServiceImpl.findByUsername(expertUsername).get();
         subService.getExperts().add(expert);
         subServiceServiceImpl.update(subService);
+        System.out.println(expert.getSubServices());
 //        expertServiceImpl.update(expert);
     }
 
     @Override
     @Transactional
     public void removeExpert(String titleSubService, String expertUsername) {
-        SubService subService = subServiceServiceImpl.findByTitle(titleSubService).get();
+//        SubService subService = subServiceServiceImpl.findByTitle(titleSubService).get();
         Expert expert = expertServiceImpl.findByUsername(expertUsername).get();
-//        expert.getSubServices().remove(subService);
-        subService.getExperts().remove(expert);
-        subServiceServiceImpl.update(subService);
+        List<SubService> subServices = expert.getSubServices();
+        System.out.println("-----------------------------");
+        System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
+        System.out.println("-----------------------------");
+        for (int i=0;i<subServices.size();i++){
+            if(subServices.get(i).getTitle().equals(titleSubService)){
+                subServices.remove(i);
+            }
+        }
+//        subService.getExperts().remove(expert);
+//        subServiceServiceImpl.update(subService);
+        System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
+        expert.setSubServices(subServices);
+        expertServiceImpl.update(expert);
+        System.out.println("-----------------------------");
+        System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
+        System.out.println("-----------------------------");
     }
+
 
     @Override
     public Optional<Manager> login(String user, String pass) {
@@ -121,27 +138,31 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ListRequestExpertDto showRequestExperts() {
         List<RequestExpert> list = requestExpertServiceImpl.findStatusWaiting();
-        List<RequestExpertDto> requestExpertDtos=new ArrayList<>();
-        for (RequestExpert r : list){
+        List<RequestExpertDto> requestExpertDtos = new ArrayList<>();
+        for (RequestExpert r : list) {
             requestExpertDtos.add(requestExpertMapper.convert(r));
         }
 
-            return new ListRequestExpertDto(requestExpertDtos);
+        return new ListRequestExpertDto(requestExpertDtos);
     }
 
     @Override
     @Transactional
     public void changeStatusRequestExpert(Long requestExpertId, Long statusExpert) {
         RequestExpert requestExpert = requestExpertServiceImpl.findById(requestExpertId).get();
+        Expert expert = requestExpert.getExpert();
+        SubService subService = requestExpert.getSubService();
         if (requestExpert != null) {
-            if(statusExpert==1){
+            if (statusExpert == 1) {
                 requestExpert.setStatusExpert(StatusExpert.accept);
-            } else if (statusExpert==0) {
+                expert.getSubServices().add(subService);
+                requestExpertServiceImpl.save(requestExpert);
+                expertServiceImpl.update(expert);
+            } else if (statusExpert == 0) {
                 requestExpert.setStatusExpert(StatusExpert.Refuse);
-            }else {
+            } else {
                 throw new InputeException("The input value is greater than number 1");
             }
-            requestExpertServiceImpl.save(requestExpert);
         } else {
             throw new NotFoundException("Not found Request");
         }
@@ -168,6 +189,20 @@ public class ManagerServiceImpl implements ManagerService {
             serviceServiceImpl.update(service);
         } else {
             throw new NotFoundException("not found SubService ");
+        }
+    }
+
+    @Override
+    public ListFilterDto filter(FilterDto filterDto) {
+
+        if (filterDto.getFilterEnum().equals(FilterEnum.Customer)) {
+            List<Customer> customerList = customerService.finAll();
+            return customerFilter.filter(customerList, filterDto);
+        } else if (filterDto.getFilterEnum().equals(FilterEnum.Expert)) {
+            List<Expert> expertList = expertServiceImpl.findAll();
+            return expertFilter.filter(expertList,filterDto);
+        } else {
+            return null;
         }
     }
 }

@@ -4,6 +4,7 @@ import com.example.faz3.dto.ListOrderDto;
 import com.example.faz3.dto.RequestExpertDto;
 import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
+import com.example.faz3.entity.Comment;
 import com.example.faz3.entity.Expert;
 import com.example.faz3.entity.Order;
 
@@ -22,8 +23,9 @@ public interface ExpertService {
     public Optional<Expert> findByUsername(String user);
     public boolean isExpertList(String subService, String expertUser);
     void update(Expert expert);
-
-
+    void updateScore(Comment comment);
+    double showScore(String expertUsername);
+    List<Expert> findAll();
 
 
 

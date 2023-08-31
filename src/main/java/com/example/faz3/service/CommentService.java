@@ -3,7 +3,6 @@ package com.example.faz3.service;
 import com.example.faz3.entity.Comment;
 import com.example.faz3.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public class CommentService {
 //        this.repository = repository;
 //    }
 
-    public void createComment(Comment comment){
+    public void save(Comment comment){
         repository.save(comment);
     }
 }

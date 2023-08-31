@@ -1,5 +1,7 @@
 package com.example.faz3.controller;
 
+import com.example.faz3.dto.FilterDto;
+import com.example.faz3.dto.ListFilterDto;
 import com.example.faz3.dto.ListRequestExpertDto;
 import com.example.faz3.dto.addExpertToSubService;
 import com.example.faz3.dto.manager.ServiceDto;
@@ -69,26 +71,33 @@ public class ManagerController {
     }
 
     @PutMapping("/change-status-RequestExpert/{requestExpertId}/{statusExpert}")
-    void changeStatusRequestExpert(@PathVariable Long requestExpertId, @PathVariable Long statusExpert) {
+    public void changeStatusRequestExpert(@PathVariable Long requestExpertId, @PathVariable Long statusExpert) {
         managerService.changeStatusRequestExpert(requestExpertId, statusExpert);
     }
     @PostMapping("/add-expertToSubService")
-    int addExpert(@RequestBody addExpertToSubService dto){
+    public void addExpert(@RequestBody addExpertToSubService dto){
         managerService.addExpert(dto.getTitleSubService(), dto.getExpertUsername());
-        SubService subService = subServiceService.findByTitle("PlasterWork").get();
-        System.out.println(subService.getExperts());
+//        SubService subService = subServiceService.findByTitle(dto.getTitleSubService()).get();
+//        System.out.println(subService.getExperts());
 //        subService.getExperts().clear();
-        Expert expert = expertService.findByUsername("M").get();
+//        Expert expert = expertService.findByUsername("M").get();
 //        expert.getSubServices().clear();
-        List<Expert> experts = subService.getExperts();
-        return experts.size();
+//        List<Expert> experts = subService.getExperts();
+//        return experts.size();
     }
     @DeleteMapping("/remove-Expert")
-    List<Expert> removeExpert(@RequestBody addExpertToSubService dto){
+    public void removeExpert(@RequestBody addExpertToSubService dto){
         managerService.removeExpert(dto.getTitleSubService(), dto.getExpertUsername());
-        SubService subService = subServiceService.findByTitle(dto.getTitleSubService()).get();
-        return subService.getExperts();
+//        SubService subService = subServiceService.findByTitle(dto.getTitleSubService()).get();
+//        return subService.getExperts();
     }
-
+    @GetMapping("/filter")
+    public ListFilterDto filterDto(@RequestBody FilterDto filterDto){
+       return managerService.filter(filterDto);
+    }
+    @GetMapping("/test")
+    public FilterDto test(@RequestBody FilterDto filterDto){
+        return filterDto;
+    }
 
 }

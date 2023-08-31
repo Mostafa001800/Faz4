@@ -1,5 +1,7 @@
 package com.example.faz3.service;
 
+import com.example.faz3.dto.FilterDto;
+import com.example.faz3.dto.ListFilterDto;
 import com.example.faz3.dto.ListRequestExpertDto;
 import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
@@ -26,5 +28,6 @@ public interface ManagerService {
     void removeService(ServiceDto serviceDto);
     void addService(ServiceDto ServiceDto);
     Optional<Manager> login(String user, String pass);
+    ListFilterDto filter(FilterDto filterDto);
 
 }

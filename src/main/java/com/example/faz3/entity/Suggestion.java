@@ -25,7 +25,7 @@ public class Suggestion extends BaseEntity<Long> {
     LocalDateTime date;
     double price;
     LocalTime DurationOfWork;
-
+    boolean accepted;
     @Override
     public String toString() {
         return "Suggestion{" +
@@ -35,5 +35,9 @@ public class Suggestion extends BaseEntity<Long> {
                 ", price=" + price +
                 ", DurationOfWork=" + DurationOfWork +
                 '}'+"\n";
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
     }
 }

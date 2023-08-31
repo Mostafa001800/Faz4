@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public interface OrderService {
     public void save(Order order);
-    public void update(Order order);
     public Optional<Order> findById(Long Id);
     public List<Order> findAll();
+
+    void update(Order order);
 }

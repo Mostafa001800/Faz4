@@ -3,6 +3,7 @@ package com.example.faz3.service.impl;
 import com.example.faz3.entity.Order;
 import com.example.faz3.repository.OrderRepository;
 import com.example.faz3.service.OrderService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderServiceImpl(OrderRepository orderRepository) {
         this.repository = orderRepository;
     }
-
+@Transactional
     @Override
     public void save(Order order) {
         repository.save(order);
