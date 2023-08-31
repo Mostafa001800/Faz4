@@ -1,9 +1,6 @@
 package com.example.faz3.controller;
 
-import com.example.faz3.dto.CommentDto;
-import com.example.faz3.dto.CustomerDto;
-import com.example.faz3.dto.InputJobDto;
-import com.example.faz3.dto.OrderDto;
+import com.example.faz3.dto.*;
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Expert;
 import com.example.faz3.entity.Order;
@@ -35,17 +32,15 @@ public class CustomerController {
     }
 
     @GetMapping("/show-SuggestionByPrice/{orderId}")
-    public List<Suggestion> showSuggestionByPrice(@PathVariable Long orderId) {
-        List<Suggestion> suggestions = customerService.showSuggestionByPrice(orderId);
-        System.out.println(suggestions);
-        return null;
+    public ListSuggestionDto showSuggestionByPrice(@PathVariable Long orderId) {
+        ListSuggestionDto suggestionDto = customerService.showSuggestionByPrice(orderId);
+        return suggestionDto;
     }
 
     @GetMapping("/show-SuggestionByScore/{orderId}")
-    public List<Suggestion> showSuggestionByScore(@PathVariable Long orderId) {
-        List<Suggestion> suggestions = customerService.showSuggestionByScore(orderId);
-        System.out.println(suggestions);
-        return null;
+    public ListSuggestionDto showSuggestionByScore(@PathVariable Long orderId) {
+        ListSuggestionDto suggestionsDto = customerService.showSuggestionByScore(orderId);
+        return suggestionsDto;
     }
 
     @PutMapping("/select-Expert/{customerUsername}/{orderId}/{suggestionId}")
@@ -80,8 +75,8 @@ public class CustomerController {
     @PutMapping("/card-Payment/{customerUsername}/{orderId}")
     ModelAndView CardPayment(@PathVariable String customerUsername, @PathVariable Long orderId, Model model) {
         InputJobDto inputJobDto = new InputJobDto(customerUsername, orderId);
-        model.addAttribute("timer", inputJobDto);
-        String s = customerService.CashPayment(inputJobDto);
+//        model.addAttribute("timer", inputJobDto);
+//        String s = customerService.CashPayment(inputJobDto);
         return new ModelAndView("index");
     }
 

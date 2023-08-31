@@ -1,9 +1,6 @@
 package com.example.faz3.service;
 
-import com.example.faz3.dto.CommentDto;
-import com.example.faz3.dto.CustomerDto;
-import com.example.faz3.dto.InputJobDto;
-import com.example.faz3.dto.OrderDto;
+import com.example.faz3.dto.*;
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Order;
 import com.example.faz3.entity.Suggestion;
@@ -22,9 +19,9 @@ public interface CustomerService {
 
     void singUp(CustomerDto customerDto);
 
-    List<Suggestion> showSuggestionByPrice(Long orderId);
+    ListSuggestionDto showSuggestionByPrice(Long orderId);
 
-    List<Suggestion> showSuggestionByScore(Long orderId);
+    ListSuggestionDto showSuggestionByScore(Long orderId);
 
     void selectExpert(String customerUsername, Long orderId, Long suggestionId);
 

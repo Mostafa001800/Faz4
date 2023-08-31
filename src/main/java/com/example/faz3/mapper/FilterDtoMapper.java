@@ -25,7 +25,7 @@ public class FilterDtoMapper {
         filterDto.setFilterEnum(FilterEnum.Expert);
         filterDto.setPassword(expert.getPassword());
         filterDto.setScore(expert.getScore());
-        filterDto.setSubServiceTitle(expert.getSubServices().get(1).getTitle());
+        filterDto.setSubServiceTitle(expert.getSubServices().get(0).getTitle());
         return filterDto;
     }
 }

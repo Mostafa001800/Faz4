@@ -8,17 +8,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class SuggestionMapper {
-//    private final ExpertService expertService;
-//    private final OrderService orderService;
 
     public Suggestion convert(SuggestionDto suggestionDto) {
         Suggestion suggestion = new Suggestion();
-//        suggestion.setExpert(expertService.findByUsername(suggestionDto.getExpertUsername()).get());
-//        suggestion.setOrder(orderService.findById(suggestionDto.getOrderId()).get());
         suggestion.setDate(suggestionDto.getDate());
         suggestion.setDurationOfWork(suggestionDto.getDurationOfWork());
         suggestion.setPrice(suggestionDto.getPrice());
         return suggestion;
-//        return null;
     }
+    public SuggestionDto convert(Suggestion suggestion) {
+        SuggestionDto suggestionDto = new SuggestionDto();
+        suggestionDto.setDate(suggestion.getDate());
+        suggestionDto.setDurationOfWork(suggestion.getDurationOfWork());
+        suggestionDto.setPrice(suggestion.getPrice());
+        return suggestionDto;
+    }
+
 }

@@ -1,16 +1,14 @@
 package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
-import com.example.faz3.dto.CommentDto;
-import com.example.faz3.dto.CustomerDto;
-import com.example.faz3.dto.InputJobDto;
-import com.example.faz3.dto.OrderDto;
+import com.example.faz3.dto.*;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.exception.*;
 import com.example.faz3.mapper.CommentMapper;
 import com.example.faz3.mapper.CustomerMapper;
 import com.example.faz3.mapper.OrderMapper;
+import com.example.faz3.mapper.SuggestionMapper;
 import com.example.faz3.repository.CustomerRepository;
 import com.example.faz3.service.CommentService;
 import com.example.faz3.service.CustomerService;
@@ -19,6 +17,7 @@ import com.example.faz3.service.SuggestionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -36,6 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
     CustomerMapper customerMapper = new CustomerMapper();
     OrderMapper orderMapper = new OrderMapper();
     CommentMapper commentMapper = new CommentMapper();
+    SuggestionMapper suggestionMapper=new SuggestionMapper();
 
     @Override
     public Optional<Customer> Login(String user, String pass) {
@@ -91,19 +91,27 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Suggestion> showSuggestionByPrice(Long orderId) {
+    public ListSuggestionDto showSuggestionByPrice(Long orderId) {
+        List<SuggestionDto> list=new ArrayList<>();
         Order order = orderServiceImpl.findById(orderId).get();
         List<Suggestion> suggestions = order.getSuggestion();
         Collections.sort(suggestions, Comparator.comparing(Suggestion::getPrice));
-        return suggestions;
+        for (Suggestion s:suggestions) {
+            list.add(suggestionMapper.convert(s));
+        }
+        return new ListSuggestionDto(list);
     }
 
     @Override
-    public List<Suggestion> showSuggestionByScore(Long orderId) {
+    public ListSuggestionDto showSuggestionByScore(Long orderId) {
+        List<SuggestionDto> list=new ArrayList<>();
         Order order = orderServiceImpl.findById(orderId).get();
         List<Suggestion> suggestions = order.getSuggestion();
         Collections.sort(suggestions, Comparator.comparingDouble(Suggestion::getPrice).reversed());
-        return suggestions;
+        for (Suggestion s:suggestions) {
+            list.add(suggestionMapper.convert(s));
+        }
+        return new ListSuggestionDto(list);
     }
 
     @Transactional
