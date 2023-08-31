@@ -15,7 +15,7 @@ public class OrderMapper {
     public OrderDto convert(Order order){
         OrderDto orderDto=new OrderDto();
         orderDto.setCustomerUsername(order.getCustomer().getUsername());
-        orderDto.setSubServiceId(order.getSubService().getTitle());
+        orderDto.setSubServiceTitle(order.getSubService().getTitle());
         orderDto.setTitle(order.getTitle());
         orderDto.setDate(order.getDate());
         orderDto.setAddress(order.getAddress());

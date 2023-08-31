@@ -61,12 +61,12 @@
             if (--timer < 0) {
                 clearInterval(intervalId);
                 display.textContent = "Timer Finished!";
-                location.reload();
+                location.replace("timeEnd.html");
             }
         }, 1000);
     }
 
-    const timeMinutes = 10 * 60;
+    const timeMinutes = 1 * 60;
     const timerDisplay = document.getElementById("timer-display");
     startTimer(timeMinutes, timerDisplay);
 

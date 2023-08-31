@@ -14,5 +14,5 @@ public class SuggestionDto {
     Long orderId;
     LocalDateTime date;
     double price;
-    LocalTime DurationOfWork;
+    LocalTime durationOfWork;
 }

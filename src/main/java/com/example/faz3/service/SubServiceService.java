@@ -6,11 +6,11 @@ import com.example.faz3.entity.SubService;
 import java.util.Optional;
 
 public interface SubServiceService {
-    public void update(SubService subService);
-    public void save(SubServiceDto subServiceDto);
-    public void deleteById(Long id);
-    public boolean repetitive(SubService subService);
-    public Optional<SubService> findById(Long id);
-    public Optional<SubService> findByTitle(String title);
+    void update(SubService subService);
+    void save(SubServiceDto subServiceDto);
+    void deleteById(Long id);
+    boolean repetitive(SubService subService);
+    Optional<SubService> findById(Long id);
+    Optional<SubService> findByTitle(String title);
 
 }

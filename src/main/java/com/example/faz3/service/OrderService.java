@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
-    public void save(Order order);
-    public Optional<Order> findById(Long Id);
-    public List<Order> findAll();
+    void save(Order order);
+    Optional<Order> findById(Long Id);
+    List<Order> findAll();
 
     void update(Order order);
 }

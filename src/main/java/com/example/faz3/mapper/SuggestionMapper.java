@@ -2,8 +2,6 @@ package com.example.faz3.mapper;
 
 import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.entity.Suggestion;
-import com.example.faz3.service.ExpertService;
-import com.example.faz3.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

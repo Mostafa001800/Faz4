@@ -7,6 +7,7 @@ import com.example.faz3.exception.SaveException;
 import com.example.faz3.mapper.SubServiceMapper;
 import com.example.faz3.repository.SubServiceRepository;
 import com.example.faz3.service.SubServiceService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +24,12 @@ public class SubServiceServiceImpl implements SubServiceService {
 //    public SubServiceServiceImpl(SubServiceRepository repository) {
 //        this.repository = repository;
 //    }
-
+@Transactional
     @Override
     public void update(SubService subService) {
         repository.save(subService);
     }
-
+    @Transactional
     @Override
     public void save(SubServiceDto subServiceDto) {
         SubService subService = subServiceMapper.convert(subServiceDto);
@@ -43,7 +44,7 @@ public class SubServiceServiceImpl implements SubServiceService {
             throw new SaveException("There was a problem registering");
         }
     }
-
+    @Transactional
     @Override
     public void deleteById(Long id) {
 //        SubService subService = findById(id).get();

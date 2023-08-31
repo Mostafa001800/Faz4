@@ -178,12 +178,12 @@ public class ExpertServiceImpl implements ExpertService {
         }
         return test;
     }
-
+    @Transactional
     @Override
     public void update(Expert expert) {
         repository.save(expert);
     }
-
+    @Transactional
     @Override
     public void updateScore(Comment comment) {
         Expert expert = comment.getOrder().getExpert();

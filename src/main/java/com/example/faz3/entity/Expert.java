@@ -21,7 +21,7 @@ public class Expert extends Person {
     byte[] image;
     double valet=0;
     double Score=0;
-    @ManyToMany(mappedBy = "experts",fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "experts",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     List<SubService> subServices=new ArrayList<>();
     @OneToMany(mappedBy = "expert" ,fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     List<Order> orders=new ArrayList<>();

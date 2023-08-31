@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ExpertService {
-    public Optional<Expert> login(String user, String pass);
-    public ListOrderDto works(Expert expert);
-    public void chanelPassword(Expert expert, String pass);
-    public void singUp(ExpertDto expertDto);
-    public void saveImage(Expert expert, String location);
-    public void registerTheOffer(SuggestionDto suggestionDto);
-    public void requestExpert(RequestExpertDto requestExpertDto);
-    public Optional<Expert> findById(Long id);
-    public Optional<Expert> findByUsername(String user);
-    public boolean isExpertList(String subService, String expertUser);
+    Optional<Expert> login(String user, String pass);
+    ListOrderDto works(Expert expert);
+    void chanelPassword(Expert expert, String pass);
+    void singUp(ExpertDto expertDto);
+    void saveImage(Expert expert, String location);
+    void registerTheOffer(SuggestionDto suggestionDto);
+    void requestExpert(RequestExpertDto requestExpertDto);
+    Optional<Expert> findById(Long id);
+    Optional<Expert> findByUsername(String user);
+    boolean isExpertList(String subService, String expertUser);
     void update(Expert expert);
     void updateScore(Comment comment);
     double showScore(String expertUsername);

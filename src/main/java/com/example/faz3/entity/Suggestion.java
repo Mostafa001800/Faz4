@@ -38,6 +38,6 @@ public class Suggestion extends BaseEntity<Long> {
     }
 
     public void setAccepted(boolean accepted) {
-        this.accepted = accepted;
+        this.accepted = true;
     }
 }

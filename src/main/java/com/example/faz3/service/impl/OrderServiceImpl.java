@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void update(Order order) {
         repository.save(order);
     }

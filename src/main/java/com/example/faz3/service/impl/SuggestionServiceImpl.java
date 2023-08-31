@@ -9,6 +9,7 @@ import com.example.faz3.repository.SuggestionRepository;
 import com.example.faz3.service.ExpertService;
 import com.example.faz3.service.OrderService;
 import com.example.faz3.service.SuggestionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class SuggestionServiceImpl implements SuggestionService {
     private final SuggestionRepository repository;
 
     SuggestionMapper suggestionMapper=new SuggestionMapper();
-
+    @Transactional
     @Override
     public void save(Suggestion suggestion) {
 //        Suggestion suggestion = suggestionMapper.convert(suggestionDto);

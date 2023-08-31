@@ -48,19 +48,19 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     @Transactional
     public void removeExpert(String titleSubService, String expertUsername) {
-//        SubService subService = subServiceServiceImpl.findByTitle(titleSubService).get();
+
         Expert expert = expertServiceImpl.findByUsername(expertUsername).get();
         List<SubService> subServices = expert.getSubServices();
+        SubService subService=subServiceServiceImpl.findByTitle(titleSubService).get();
         System.out.println("-----------------------------");
         System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
         System.out.println("-----------------------------");
         for (int i=0;i<subServices.size();i++){
             if(subServices.get(i).getTitle().equals(titleSubService)){
                 subServices.remove(i);
+                subService.getExperts().remove(i);
             }
         }
-//        subService.getExperts().remove(expert);
-//        subServiceServiceImpl.update(subService);
         System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
         expert.setSubServices(subServices);
         expertServiceImpl.update(expert);
@@ -156,10 +156,13 @@ public class ManagerServiceImpl implements ManagerService {
             if (statusExpert == 1) {
                 requestExpert.setStatusExpert(StatusExpert.accept);
                 expert.getSubServices().add(subService);
+                subService.getExperts().add(expert);
+                subServiceServiceImpl.update(subService);
                 requestExpertServiceImpl.save(requestExpert);
                 expertServiceImpl.update(expert);
             } else if (statusExpert == 0) {
                 requestExpert.setStatusExpert(StatusExpert.Refuse);
+                requestExpertServiceImpl.save(requestExpert);
             } else {
                 throw new InputeException("The input value is greater than number 1");
             }

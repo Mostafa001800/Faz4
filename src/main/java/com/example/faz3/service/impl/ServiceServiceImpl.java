@@ -7,6 +7,7 @@ import com.example.faz3.exception.SaveException;
 import com.example.faz3.mapper.ServiceMapper;
 import com.example.faz3.repository.ServiceRepository;
 import com.example.faz3.service.ServiceService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ public class ServiceServiceImpl implements ServiceService {
         }
         return b;
     }
+    @Transactional
     @Override
     public void save(ServiceDto serviceDto) throws InvalidPasswordException {
         com.example.faz3.entity.Service service=serviceMapper.convert(serviceDto);
@@ -41,10 +43,12 @@ public class ServiceServiceImpl implements ServiceService {
             throw new SaveException("There was a problem registering");
         }
     }
+    @Transactional
     @Override
     public void update(com.example.faz3.entity.Service service){
         repository.save(service);
     }
+    @Transactional
     @Override
     public void delete(ServiceDto serviceDto){
         com.example.faz3.entity.Service service = serviceMapper.convert(serviceDto);

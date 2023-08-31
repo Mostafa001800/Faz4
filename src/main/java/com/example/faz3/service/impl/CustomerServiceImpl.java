@@ -79,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
+    @Transactional
     @Override
     public void singUp(CustomerDto customerDto) {
         Customer customer = customerMapper.convert(customerDto);
@@ -105,6 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
         return suggestions;
     }
 
+    @Transactional
     @Override
     public void selectExpert(String customerUsername, Long orderId, Long suggestionId) {
         Customer customer = findByUsername(customerUsername).get();
@@ -155,6 +157,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     }
 
+    @Transactional
     @Override
     public void startWork(Customer customer, int orderId) {
         if (customer.getOrders().size() > orderId) {
@@ -191,12 +194,15 @@ public class CustomerServiceImpl implements CustomerService {
         return test;
     }
 
+    @Transactional
     @Override
     public void registerOrder(OrderDto orderDto) {
         Order order = orderMapper.convert(orderDto);
         order.setCustomer(findByUsername(orderDto.getCustomerUsername()).get());
-        order.setSubService(subServiceService.findByTitle(orderDto.getSubServiceId()).get());
-        orderServiceImpl.save(order);
+        order.setSubService(subServiceService.findByTitle(orderDto.getSubServiceTitle()).get());
+        if (order.getDate().isAfter(LocalDateTime.now())) {
+            orderServiceImpl.save(order);
+        }
     }
 
     @Override
@@ -205,6 +211,7 @@ public class CustomerServiceImpl implements CustomerService {
         return byUsername;
     }
 
+    @Transactional
     @Override
     public void startJob(String customerUsername, Long OrderId) {
         Customer customer = findByUsername(customerUsername).get();
@@ -218,6 +225,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
+    @Transactional
     @Override
     public void endJob(String customerUsername, Long OrderId) {
         Customer customer = findByUsername(customerUsername).get();
@@ -245,6 +253,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
+    @Transactional
     @Override
     public String CashPayment(InputJobDto inputJobDto) {
         Optional<Customer> customer = findByUsername(inputJobDto.getCustomerUsername());

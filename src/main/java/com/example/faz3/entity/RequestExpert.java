@@ -2,10 +2,7 @@ package com.example.faz3.entity;
 
 import com.example.faz3.base.domain.BaseEntity;
 import com.example.faz3.entity.enu.StatusExpert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +17,7 @@ import lombok.experimental.FieldDefaults;
 public class RequestExpert extends BaseEntity<Long> {
     @ManyToOne
     Expert expert;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     SubService subService;
     @Enumerated(EnumType.STRING)
     StatusExpert statusExpert =StatusExpert.waiting;

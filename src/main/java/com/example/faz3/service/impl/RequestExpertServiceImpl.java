@@ -4,6 +4,7 @@ import com.example.faz3.entity.RequestExpert;
 import com.example.faz3.entity.enu.StatusExpert;
 import com.example.faz3.repository.RequestExpertRepository;
 import com.example.faz3.service.RequestExpertService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ private final RequestExpertRepository repository;
         List<RequestExpert> byStatusExpert = repository.findByStatusExpert(StatusExpert.waiting);
             return byStatusExpert;
     }
+    @Transactional
     @Override
     public void save(RequestExpert requestExpert){
         repository.save(requestExpert);
