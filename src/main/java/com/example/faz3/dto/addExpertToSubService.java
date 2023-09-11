@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class addExpertToSubService {
+public class addExpertToSubService  {
    String titleSubService;
    String expertUsername;
 }
