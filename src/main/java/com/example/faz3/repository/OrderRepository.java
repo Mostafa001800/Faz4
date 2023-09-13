@@ -2,6 +2,7 @@ package com.example.faz3.repository;
 
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Order;
+import com.example.faz3.entity.SubService;
 import com.example.faz3.entity.enu.StatusOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> orderBetweenDate(LocalDateTime after, LocalDateTime before);
 
     List<Order> findByStatusOrder(StatusOrder statusOrder);
+    List<Order> findBySubService(SubService subService);
 }

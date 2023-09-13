@@ -2,6 +2,7 @@ package com.example.faz3.service.impl;
 
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Order;
+import com.example.faz3.entity.SubService;
 import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.repository.OrderRepository;
 import com.example.faz3.service.OrderService;
@@ -59,5 +60,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findByStatusOrder(StatusOrder statusOrder) {
         return repository.findByStatusOrder(statusOrder);
+    }
+
+    @Override
+    public List<Order> findBySubService(SubService subService) {
+        return repository.findBySubService(subService);
     }
 }

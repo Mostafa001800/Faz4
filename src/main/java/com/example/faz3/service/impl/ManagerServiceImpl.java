@@ -292,6 +292,7 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public ListOrderDto showOrdersByStatusOrder(String status) {
+
         List<OrderDto> orderDtoList=new ArrayList<>();
 
 
@@ -313,6 +314,22 @@ public class ManagerServiceImpl implements ManagerService {
         }
 
         List<Order> orders = orderService.findByStatusOrder(statusOrder);
+        for (Order order : orders){
+            OrderDto convert = orderMapper.convert(order);
+            orderDtoList.add(convert);
+        }
+        return new ListOrderDto(orderDtoList);
+    }
+
+    @Override
+    public ListOrderDto showOrderBySubService(String subServiceTitle) {
+        List<OrderDto> orderDtoList=new ArrayList<>();
+
+        Optional<SubService> subService = subServiceServiceImpl.findByTitle(subServiceTitle);
+        if(subService.isEmpty()){
+            throw new InputeException("You entered a blank entry !");
+        }
+        List<Order> orders = orderService.findBySubService(subService.get());
         for (Order order : orders){
             OrderDto convert = orderMapper.convert(order);
             orderDtoList.add(convert);

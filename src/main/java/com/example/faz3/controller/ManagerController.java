@@ -98,7 +98,7 @@ public class ManagerController {
         return filterDto;
     }
 
-    @GetMapping("/showRequestExperts")
+    @GetMapping("/showRequestCustomer")
     public ListCustomerDto filterOrderDoneCustomer() {
         return managerService.filterOrderCustomer();
     }
@@ -116,5 +116,10 @@ public class ManagerController {
     @GetMapping("/showOrdersByStatusOrder/{status}")
     public ListOrderDto showOrdersByStatusOrder(@PathVariable String status) {
         return managerService.showOrdersByStatusOrder(status);
+    }
+
+    @GetMapping("showOrderBySubService/{subServiceTitle}")
+    public ListOrderDto showOrderBySubService(@PathVariable String subServiceTitle) {
+        return managerService.showOrderBySubService(subServiceTitle);
     }
 }

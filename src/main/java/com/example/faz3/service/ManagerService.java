@@ -47,5 +47,5 @@ public interface ManagerService {
     ListExpertDto filterOrderExpert();
     ListOrderDto showOrderBetweenDate(LocalDateTime after,LocalDateTime before);
     ListOrderDto showOrdersByStatusOrder(String status);
-
+ListOrderDto showOrderBySubService(String subServiceTitle);
 }

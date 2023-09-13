@@ -3,6 +3,7 @@ package com.example.faz3.service;
 import com.example.faz3.dto.ListOrderDto;
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Order;
+import com.example.faz3.entity.SubService;
 import com.example.faz3.entity.enu.StatusOrder;
 
 import java.time.LocalDateTime;
@@ -18,5 +19,6 @@ public interface OrderService {
     List<Order> findByCustomerAndStatusOrder(Customer customer, StatusOrder statusOrder);
     List<Order> OrderBetweenDate(LocalDateTime after, LocalDateTime before);
     List<Order> findByStatusOrder(StatusOrder statusOrder);
+    List<Order> findBySubService(SubService subService);
 
 }
