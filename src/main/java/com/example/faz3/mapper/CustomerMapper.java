@@ -1,5 +1,6 @@
 package com.example.faz3.mapper;
 
+import com.example.faz3.base.domain.Person;
 import com.example.faz3.dto.CustomerDto;
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.enu.UserRole;
@@ -23,6 +24,15 @@ public class CustomerMapper {
         customerDto.setUsername(customer.getUsername());
         customerDto.setPassword(customer.getPassword());
         customerDto.setEmail(customer.getEmail());
+        return customerDto;
+    }
+    public CustomerDto convert(Person person){
+        CustomerDto customerDto=new CustomerDto();
+        customerDto.setFirstName(person.getFirstName());
+        customerDto.setLastName(person.getLastName());
+        customerDto.setUsername(person.getUsername());
+        customerDto.setPassword(person.getPassword());
+        customerDto.setEmail(person.getEmail());
         return customerDto;
     }
 

@@ -9,6 +9,7 @@ import com.example.faz3.service.SubServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +110,7 @@ public class ManagerController {
     }
 
     @GetMapping("/showOrderBetweenDateSto")
-    public ListOrderDto showOrderBetweenDateSto(@RequestBody ShowOrderBetweenDateSto sto) {
+    public ListOrderDto showOrderBetweenDateSto(@RequestBody TimeDto sto) {
         return managerService.showOrderBetweenDate(sto.getAfter(), sto.getBefore());
     }
 
@@ -121,5 +122,10 @@ public class ManagerController {
     @GetMapping("showOrderBySubService/{subServiceTitle}")
     public ListOrderDto showOrderBySubService(@PathVariable String subServiceTitle) {
         return managerService.showOrderBySubService(subServiceTitle);
+    }
+
+    @GetMapping("showCustomerByConfirmedAt")
+    public ListCustomerDto showCustomerByConfirmedAt(@RequestBody TimeDto timeDto) {
+        return managerService.showCustomerByConfirmedAt(timeDto.getAfter(), timeDto.getBefore());
     }
 }

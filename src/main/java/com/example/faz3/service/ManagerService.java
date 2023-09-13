@@ -44,8 +44,13 @@ public interface ManagerService {
     Optional<Manager> findByEmail(String email);
 
     ListCustomerDto filterOrderCustomer();
+
     ListExpertDto filterOrderExpert();
-    ListOrderDto showOrderBetweenDate(LocalDateTime after,LocalDateTime before);
+
+    ListOrderDto showOrderBetweenDate(LocalDateTime after, LocalDateTime before);
+
     ListOrderDto showOrdersByStatusOrder(String status);
-ListOrderDto showOrderBySubService(String subServiceTitle);
+
+    ListOrderDto showOrderBySubService(String subServiceTitle);
+    ListCustomerDto showCustomerByConfirmedAt(LocalDateTime after, LocalDateTime before);
 }

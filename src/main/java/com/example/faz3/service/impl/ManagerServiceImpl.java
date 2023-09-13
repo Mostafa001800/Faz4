@@ -336,4 +336,17 @@ public class ManagerServiceImpl implements ManagerService {
         }
         return new ListOrderDto(orderDtoList);
     }
+
+    @Override
+    public ListCustomerDto showCustomerByConfirmedAt(LocalDateTime after, LocalDateTime before) {
+        List<CustomerDto> customerDtoList=new ArrayList<>();
+
+        List<ConfigurationToken> list =
+                configurationTokenService.findByConfirmedAt(after, before);
+        for (ConfigurationToken token : list){
+            CustomerDto convert = customerMapper.convert(token.getPerson());
+            customerDtoList.add(convert);
+        }
+        return new ListCustomerDto(customerDtoList);
+    }
 }

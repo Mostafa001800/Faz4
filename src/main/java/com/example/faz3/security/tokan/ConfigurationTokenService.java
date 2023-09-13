@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,4 +23,8 @@ public class ConfigurationTokenService {
     public void setConfirmedAt(String token) {
         repository.updateConfirmedAt(token, LocalDateTime.now());
     }
+    public List<ConfigurationToken> findByConfirmedAt(LocalDateTime after, LocalDateTime before){
+        return repository.findByConfirmedAt(after,before);
+    }
+
 }

@@ -7,12 +7,18 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+
 @Repository
-public interface ConfigurationTokenRepository extends JpaRepository<ConfigurationToken,Long> {
+public interface ConfigurationTokenRepository extends JpaRepository<ConfigurationToken, Long> {
     Optional<ConfigurationToken> findByToken(String token);
+
     @Transactional
     @Modifying
     @Query("UPDATE ConfigurationToken c SET c.confirmedAt = ?2 WHERE c.token = ?1")
-    int updateConfirmedAt(String token, LocalDateTime localDateTime);
+    void updateConfirmedAt(String token, LocalDateTime localDateTime);
+
+    @Query("select C from ConfigurationToken C where C.confirmedAt BETWEEN ?1 AND ?2 ")
+    List<ConfigurationToken> findByConfirmedAt(LocalDateTime after, LocalDateTime before);
 }

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShowOrderBetweenDateSto {
+public class TimeDto {
     LocalDateTime after;
     LocalDateTime before;
 }
