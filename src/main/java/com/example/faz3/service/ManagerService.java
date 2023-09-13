@@ -6,6 +6,7 @@ import com.example.faz3.dto.manager.SubServiceDto;
 import com.example.faz3.entity.Manager;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -44,4 +45,7 @@ public interface ManagerService {
 
     ListCustomerDto filterOrderCustomer();
     ListExpertDto filterOrderExpert();
+    ListOrderDto showOrderBetweenDate(LocalDateTime after,LocalDateTime before);
+    ListOrderDto showOrdersByStatusOrder(String status);
+
 }

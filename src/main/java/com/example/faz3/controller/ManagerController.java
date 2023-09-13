@@ -107,4 +107,14 @@ public class ManagerController {
     public ListExpertDto filterOrderExpert() {
         return null;
     }
+
+    @GetMapping("/showOrderBetweenDateSto")
+    public ListOrderDto showOrderBetweenDateSto(@RequestBody ShowOrderBetweenDateSto sto) {
+        return managerService.showOrderBetweenDate(sto.getAfter(), sto.getBefore());
+    }
+
+    @GetMapping("/showOrdersByStatusOrder/{status}")
+    public ListOrderDto showOrdersByStatusOrder(@PathVariable String status) {
+        return managerService.showOrdersByStatusOrder(status);
+    }
 }

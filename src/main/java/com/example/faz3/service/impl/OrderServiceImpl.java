@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,5 +49,15 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> findByCustomerAndStatusOrder(Customer customer, StatusOrder statusOrder) {
         List<Order> orders = repository.findByCustomerAndStatusOrder(customer, statusOrder);
         return orders;
+    }
+
+    @Override
+    public List<Order> OrderBetweenDate(LocalDateTime after, LocalDateTime before) {
+       return repository.orderBetweenDate(after,before);
+    }
+
+    @Override
+    public List<Order> findByStatusOrder(StatusOrder statusOrder) {
+        return repository.findByStatusOrder(statusOrder);
     }
 }

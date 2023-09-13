@@ -7,20 +7,19 @@ import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusExpert;
+import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.entity.enu.UserRole;
 import com.example.faz3.exception.*;
 import com.example.faz3.filter.CustomerFilter;
 import com.example.faz3.filter.ExpertFilter;
-import com.example.faz3.mapper.CustomerMapper;
-import com.example.faz3.mapper.ExpertMapper;
-import com.example.faz3.mapper.ManagerMapper;
-import com.example.faz3.mapper.RequestExpertMapper;
+import com.example.faz3.mapper.*;
 import com.example.faz3.repository.ManagerRepository;
 import com.example.faz3.security.tokan.ConfigurationToken;
 import com.example.faz3.security.tokan.ConfigurationTokenService;
 import com.example.faz3.service.CustomerService;
 import com.example.faz3.service.EmailService;
 import com.example.faz3.service.ManagerService;
+import com.example.faz3.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -42,6 +41,7 @@ public class ManagerServiceImpl implements ManagerService {
     private final ServiceServiceImpl serviceServiceImpl;
     private final ExpertServiceImpl expertServiceImpl;
     private final CustomerService customerService;
+    private final OrderService orderService;
     private final ConfigurationTokenService configurationTokenService;
     private final EmailService emailService;
     private final RequestExpertServiceImpl requestExpertServiceImpl;
@@ -51,6 +51,7 @@ public class ManagerServiceImpl implements ManagerService {
     ManagerMapper managerMapper = new ManagerMapper();
     CustomerMapper customerMapper=new CustomerMapper();
     ExpertMapper expertMapper=new ExpertMapper();
+    OrderMapper orderMapper=new OrderMapper();
 
 
     @Override
@@ -270,12 +271,52 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public ListExpertDto filterOrderExpert() {
         List<ExpertDto> list=new ArrayList<>();
-        List<Expert> expertList=new ArrayList<>();
-        List<Expert> expertList1=expertFilter.filterByOrder(expertServiceImpl.findAll());
-        for (Expert expert:expertList1){
+        List<Expert> expertList=expertFilter.filterByOrder(expertServiceImpl.findAll());
+        for (Expert expert:expertList){
             ExpertDto convert = expertMapper.convert(expert);
             list.add(convert);
         }
         return new ListExpertDto(list);
+    }
+
+    @Override
+    public ListOrderDto showOrderBetweenDate(LocalDateTime after, LocalDateTime before) {
+        List<Order> orders = orderService.OrderBetweenDate(after, before);
+        List<OrderDto> orderDtoList=new ArrayList<>();
+        for (Order order : orders){
+            OrderDto convert = orderMapper.convert(order);
+            orderDtoList.add(convert);
+        }
+        return new ListOrderDto(orderDtoList);
+    }
+
+    @Override
+    public ListOrderDto showOrdersByStatusOrder(String status) {
+        List<OrderDto> orderDtoList=new ArrayList<>();
+
+
+        StatusOrder statusOrder = null;
+        if (status.equals("ExpertSelection")) {
+            statusOrder = StatusOrder.ExpertSelection;
+        } else if (status.equals("ExpertSuggestions")) {
+            statusOrder = StatusOrder.ExpertSuggestions;
+        } else if (status.equals("ComingTowardsYou")) {
+            statusOrder = StatusOrder.ComingTowardsYou;
+        } else if (status.equals("Started")) {
+            statusOrder = StatusOrder.Started;
+        } else if (status.equals("Done")) {
+            statusOrder = StatusOrder.Done;
+        } else if (status.equals("Payment")) {
+            statusOrder = StatusOrder.Payment;
+        } else {
+            throw new InputeException("You entered the status name incorrectly!");
+        }
+
+        List<Order> orders = orderService.findByStatusOrder(statusOrder);
+        for (Order order : orders){
+            OrderDto convert = orderMapper.convert(order);
+            orderDtoList.add(convert);
+        }
+        return new ListOrderDto(orderDtoList);
     }
 }
