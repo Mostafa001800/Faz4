@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment extends BaseEntity<Long> {
-    @OneToOne
+    @OneToOne(mappedBy = "comment")
 //    @JoinColumn(name = "Order_id", referencedColumnName = "id")
     Order order;
     int score;

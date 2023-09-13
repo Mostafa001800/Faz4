@@ -2,13 +2,15 @@ package com.example.faz3.filter;
 
 import com.example.faz3.dto.FilterDto;
 import com.example.faz3.dto.ListFilterDto;
+import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.entity.Customer;
+import com.example.faz3.entity.Order;
+import com.example.faz3.entity.Suggestion;
 import com.example.faz3.mapper.FilterDtoMapper;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CustomerFilter {
     FilterDtoMapper filterDtoMapper=new FilterDtoMapper();
@@ -61,5 +63,13 @@ public class CustomerFilter {
         }
         return list;
     }
-
+    public List<Customer> filterByOrder(List<Customer> customers){
+        Collections.sort(customers, new Comparator<Customer>() {
+            @Override
+            public int compare(Customer o1, Customer o2) {
+                return o2.getOrders().size() - o1.getOrders().size();
+            }
+        });
+        return customers;
+    }
 }

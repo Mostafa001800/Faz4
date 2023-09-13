@@ -8,35 +8,45 @@ import com.example.faz3.dto.SuggestionDto;
 import com.example.faz3.dto.expert.ExpertDto;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
+import com.example.faz3.entity.enu.UserRole;
 import com.example.faz3.exception.*;
 import com.example.faz3.mapper.ExpertMapper;
 import com.example.faz3.mapper.OrderMapper;
 import com.example.faz3.mapper.SuggestionMapper;
 import com.example.faz3.repository.ExpertRepository;
+import com.example.faz3.security.tokan.ConfigurationToken;
+import com.example.faz3.security.tokan.ConfigurationTokenService;
 import com.example.faz3.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class ExpertServiceImpl implements ExpertService {
     private final ExpertRepository repository;
+    private final PasswordEncoder passwordEncoder;
     private final SuggestionServiceImpl suggestionServiceImpl;
     private final SubServiceServiceImpl subServiceServiceImpl;
     private final OrderServiceImpl orderServiceImpl;
     private final RequestExpertServiceImpl requestExpertServiceImpl;
     private final SuggestionMapper suggestionMapper;
+    private final ConfigurationTokenService configurationTokenService;
+    private final EmailService emailService;
     ExpertMapper expertMapper = new ExpertMapper();
-    OrderMapper orderMapper=new OrderMapper();
+    OrderMapper orderMapper = new OrderMapper();
 
 
 //    @Autowired
@@ -71,15 +81,15 @@ public class ExpertServiceImpl implements ExpertService {
     @Override
     public ListOrderDto works(Expert expert) {
 //        List<Order> orders = new ArrayList<>();
-        List<OrderDto> listOrderDto=new ArrayList<>();
+        List<OrderDto> listOrderDto = new ArrayList<>();
         List<SubService> subServices = expert.getSubServices();
         List<Order> All = orderServiceImpl.findAll();
         for (SubService subService : subServices) {
             for (Order order : All) {
                 if (order.getSubService() == subService
                         && (order.getStatusOrder() == StatusOrder.ExpertSuggestions
-                              ||  order.getStatusOrder() == StatusOrder.ExpertSelection)
-                                ) {
+                        || order.getStatusOrder() == StatusOrder.ExpertSelection)
+                ) {
                     listOrderDto.add(orderMapper.convert(order));
                 }
             }
@@ -103,6 +113,7 @@ public class ExpertServiceImpl implements ExpertService {
     @Transactional
     public void singUp(ExpertDto expertDto) {
         Expert expert = expertMapper.convert(expertDto);
+        expert.setUserRole(UserRole.EXPERT);
 //        if ((Validation.isValidEmail(expert.getEmail())) == false && Validation.isValidPassword(expert.getPassword()) == false) {
 //            throw new InvalidPasswordException("The email or Password format is not correct !");
 //        } else {
@@ -149,6 +160,7 @@ public class ExpertServiceImpl implements ExpertService {
     public void requestExpert(RequestExpertDto requestExpertDto) {
         RequestExpert requestExpert = new RequestExpert();
         requestExpert.setExpert(findByUsername(requestExpertDto.getExpertUsername()).get());
+        System.out.println(requestExpert.getExpert());
         requestExpert.setSubService(subServiceServiceImpl.findByTitle(requestExpertDto.getSubServiceTitle()).get());
         requestExpertServiceImpl.save(requestExpert);
     }
@@ -178,22 +190,24 @@ public class ExpertServiceImpl implements ExpertService {
         }
         return test;
     }
+
     @Transactional
     @Override
     public void update(Expert expert) {
         repository.save(expert);
     }
+
     @Transactional
     @Override
     public void updateScore(Comment comment) {
         Expert expert = comment.getOrder().getExpert();
-        expert.setScore(expert.getScore()+comment.getScore());
+        expert.setScore(expert.getScore() + comment.getScore());
     }
 
     @Override
     public double showScore(String expertUsername) {
         Optional<Expert> expert = findByUsername(expertUsername);
-        if(expert.isEmpty()){
+        if (expert.isEmpty()) {
             throw new NotFoundException("Not Found Expert");
         }
         return expert.get().getScore();
@@ -202,5 +216,26 @@ public class ExpertServiceImpl implements ExpertService {
     @Override
     public List<Expert> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public void newSingUp(ExpertDto expertDto) {
+        Expert expert = expertMapper.convert(expertDto);
+        expert.setPassword(passwordEncoder.encode(expertDto.getPassword()));
+        repository.save(expert);
+        String newToken = UUID.randomUUID().toString();
+        ConfigurationToken configurationToken = new ConfigurationToken(LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), expert);
+        configurationToken.setToken(newToken);
+
+        configurationTokenService.saveConfigurationToken(configurationToken);
+        SimpleMailMessage mailMessage=
+                emailService.createEmail(expert.getEmail(),
+                        configurationToken.getToken(),UserRole.EXPERT);
+        emailService.sendEmail(mailMessage);
+    }
+
+    @Override
+    public Optional<Expert> findByEmail(String email) {
+        return Optional.empty();
     }
 }

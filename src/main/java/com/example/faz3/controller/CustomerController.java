@@ -1,5 +1,6 @@
 package com.example.faz3.controller;
 
+import com.example.faz3.base.domain.Person;
 import com.example.faz3.dto.*;
 import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Expert;
@@ -9,6 +10,8 @@ import com.example.faz3.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapping;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,11 +23,6 @@ import java.util.List;
 @RequestMapping("/customer")
 public class CustomerController {
     private final CustomerService customerService;
-
-    @PostMapping("/singup")
-    public void singUp(@RequestBody CustomerDto CustomerDto) {
-        customerService.singUp(CustomerDto);
-    }
 
     @PostMapping("/register-order")
     public void registerOrder(@RequestBody OrderDto orderDto) {
@@ -43,19 +41,28 @@ public class CustomerController {
         return suggestionsDto;
     }
 
-    @PutMapping("/select-Expert/{customerUsername}/{orderId}/{suggestionId}")
-    public void selectExpert(@PathVariable String customerUsername, @PathVariable Long orderId, @PathVariable Long suggestionId) {
-        customerService.selectExpert(customerUsername, orderId, suggestionId);
+    @PutMapping("/select-Expert/{orderId}/{suggestionId}")
+    public void selectExpert(@PathVariable Long orderId, @PathVariable Long suggestionId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = (Person) authentication.getPrincipal();
+
+        customerService.selectExpert(person.getUsername(), orderId, suggestionId);
     }
 
-    @PutMapping("/startJob/{customerUsername}/{OrderId}")
-    public void startJob(@PathVariable String customerUsername, @PathVariable Long OrderId) {
-        customerService.startJob(customerUsername, OrderId);
+    @PutMapping("/startJob/{OrderId}")
+    public void startJob(@PathVariable Long OrderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = (Person) authentication.getPrincipal();
+
+        customerService.startJob(person.getUsername(), OrderId);
     }
 
-    @PutMapping("/endJob/{customerUsername}/{OrderId}")
-    public void endJob(@PathVariable String customerUsername, @PathVariable Long OrderId) {
-        customerService.endJob(customerUsername, OrderId);
+    @PutMapping("/endJob/{OrderId}")
+    public void endJob(@PathVariable Long OrderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = (Person) authentication.getPrincipal();
+
+        customerService.endJob(person.getUsername(), OrderId);
     }
 
     @PutMapping("/cash-Payment")
@@ -72,9 +79,12 @@ public class CustomerController {
 //        String s = customerService.CashPayment(inputJobDto);
 //        return new ModelAndView("index");
 //    }
-    @PutMapping("/card-Payment/{customerUsername}/{orderId}")
-    ModelAndView CardPayment(@PathVariable String customerUsername, @PathVariable Long orderId, Model model) {
-        InputJobDto inputJobDto = new InputJobDto(customerUsername, orderId);
+    @GetMapping("/card-Payment/{orderId}")
+    ModelAndView CardPayment(@PathVariable Long orderId, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = (Person) authentication.getPrincipal();
+
+        InputJobDto inputJobDto = new InputJobDto(person.getUsername(), orderId);
 //        model.addAttribute("timer", inputJobDto);
 //        String s = customerService.CashPayment(inputJobDto);
         return new ModelAndView("index");
@@ -91,5 +101,17 @@ public class CustomerController {
         customerService.registerComment(commentDto);
     }
 
+    @PostMapping("/show-wallet")
+    public double showWallet() {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Person person=(Person) authentication.getPrincipal();
+        return customerService.showWallet(person.getUsername());
 
+    }
+    @GetMapping("/show-order-statusOrder/{status}")
+    public ListOrderDto showOrderStatusOrder(@PathVariable String status) {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Person person=(Person) authentication.getPrincipal();
+        return customerService.showOrderStatusOrder(person.getUsername(),status);
+    }
 }

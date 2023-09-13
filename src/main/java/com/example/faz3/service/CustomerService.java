@@ -41,4 +41,7 @@ public interface CustomerService {
 
     List<Customer> finAll();
 
+    void newSingUp(CustomerDto customerDto);
+    double showWallet(String customerUsername);
+    ListOrderDto showOrderStatusOrder(String customerUsername, String status);
 }

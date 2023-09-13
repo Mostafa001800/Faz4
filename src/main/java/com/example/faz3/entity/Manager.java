@@ -12,4 +12,5 @@ import lombok.experimental.FieldDefaults;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Manager extends Person {
+
 }

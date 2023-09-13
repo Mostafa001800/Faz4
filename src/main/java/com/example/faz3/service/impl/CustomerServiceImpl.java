@@ -4,20 +4,21 @@ import com.example.faz3.Validation.Validation;
 import com.example.faz3.dto.*;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
+import com.example.faz3.entity.enu.UserRole;
 import com.example.faz3.exception.*;
 import com.example.faz3.mapper.CommentMapper;
 import com.example.faz3.mapper.CustomerMapper;
 import com.example.faz3.mapper.OrderMapper;
 import com.example.faz3.mapper.SuggestionMapper;
 import com.example.faz3.repository.CustomerRepository;
-import com.example.faz3.service.CommentService;
-import com.example.faz3.service.CustomerService;
-import com.example.faz3.service.SubServiceService;
-import com.example.faz3.service.SuggestionService;
+import com.example.faz3.security.tokan.ConfigurationToken;
+import com.example.faz3.security.tokan.ConfigurationTokenService;
+import com.example.faz3.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -26,16 +27,19 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 public class CustomerServiceImpl implements CustomerService {
+    private final PasswordEncoder passwordEncoder;
     private final CustomerRepository repository;
     private final OrderServiceImpl orderServiceImpl;
     private final ExpertServiceImpl expertServiceImpl;
     private final SubServiceService subServiceService;
     private final SuggestionService suggestionService;
     private final CommentService commentService;
+    private final EmailService emailService;
     CustomerMapper customerMapper = new CustomerMapper();
     OrderMapper orderMapper = new OrderMapper();
     CommentMapper commentMapper = new CommentMapper();
-    SuggestionMapper suggestionMapper=new SuggestionMapper();
+    SuggestionMapper suggestionMapper = new SuggestionMapper();
+    private final ConfigurationTokenService configurationTokenService;
 
     @Override
     public Optional<Customer> Login(String user, String pass) {
@@ -83,6 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void singUp(CustomerDto customerDto) {
         Customer customer = customerMapper.convert(customerDto);
+        customer.setUserRole(UserRole.CUSTOMER);
         if ((Validation.isValidEmail(customer.getEmail())) == false && Validation.isValidPassword(customer.getPassword()) == false) {
             throw new InvalidPasswordException("The email or password format is not correct !");
         } else {
@@ -92,11 +97,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ListSuggestionDto showSuggestionByPrice(Long orderId) {
-        List<SuggestionDto> list=new ArrayList<>();
+        List<SuggestionDto> list = new ArrayList<>();
         Order order = orderServiceImpl.findById(orderId).get();
         List<Suggestion> suggestions = order.getSuggestion();
         Collections.sort(suggestions, Comparator.comparing(Suggestion::getPrice));
-        for (Suggestion s:suggestions) {
+        for (Suggestion s : suggestions) {
             list.add(suggestionMapper.convert(s));
         }
         return new ListSuggestionDto(list);
@@ -104,11 +109,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ListSuggestionDto showSuggestionByScore(Long orderId) {
-        List<SuggestionDto> list=new ArrayList<>();
+        List<SuggestionDto> list = new ArrayList<>();
         Order order = orderServiceImpl.findById(orderId).get();
         List<Suggestion> suggestions = order.getSuggestion();
         Collections.sort(suggestions, Comparator.comparingDouble(Suggestion::getPrice).reversed());
-        for (Suggestion s:suggestions) {
+        for (Suggestion s : suggestions) {
             list.add(suggestionMapper.convert(s));
         }
         return new ListSuggestionDto(list);
@@ -283,14 +288,14 @@ public class CustomerServiceImpl implements CustomerService {
                 suggestion = s;
             }
         }
-        if (customer.get().getValet() <= suggestion.getPrice()) {
+        if (customer.get().getWallet() <= suggestion.getPrice()) {
             throw new PaymentException("*Inventory is low *");
         }
         Expert expert = suggestion.getExpert();
 
-        customer.get().setValet((customer.get().getValet()) - (suggestion.getPrice()));
+        customer.get().setWallet((customer.get().getWallet()) - (suggestion.getPrice()));
         order.get().setStatusOrder(StatusOrder.Payment);
-        expert.setValet(expert.getValet() + ((suggestion.getPrice() / 100) * 70));
+        expert.setWallet(expert.getWallet() + ((suggestion.getPrice() / 100) * 70));
         expertServiceImpl.update(expert);
         orderServiceImpl.update(order.get());
         repository.save(customer.get());
@@ -307,8 +312,8 @@ public class CustomerServiceImpl implements CustomerService {
 //                }
 //            }
 //        }
-//        if (customer.getValet() >= suggestion.getPrice()) {
-//            customer.setValet(customer.getValet() - suggestion.getPrice());
+//        if (customer.getWallet() >= suggestion.getPrice()) {
+//            customer.setWallet(customer.getWallet() - suggestion.getPrice());
 //            a.setStatusOrder(StatusOrder.Done);
 //            orderServiceImpl.update(a);
 //        }
@@ -342,6 +347,66 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<Customer> finAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public void newSingUp(CustomerDto customerDto) {
+        Customer customer = customerMapper.convert(customerDto);
+        customer.setUserRole(UserRole.CUSTOMER);
+        if ((Validation.isValidEmail(customer.getEmail())) == false && Validation.isValidPassword(customer.getPassword()) == false) {
+            throw new InvalidPasswordException("The email or password format is not correct !");
+        } else {
+            customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
+            repository.save(customer);
+        }
+        String newToken = UUID.randomUUID().toString();
+        ConfigurationToken configurationToken = new ConfigurationToken(LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), customer);
+        configurationToken.setToken(newToken);
+
+        configurationTokenService.saveConfigurationToken(configurationToken);
+        SimpleMailMessage mailMessage =
+                emailService.createEmail(customer.getEmail(), configurationToken.getToken(), customer.getUserRole());
+        emailService.sendEmail(mailMessage);
+    }
+
+    @Override
+    public double showWallet(String customerUsername) {
+        Optional<Customer> customer = findByUsername(customerUsername);
+        System.out.println("---------------------");
+        System.out.println(customerUsername);
+        System.out.println("---------------------");
+
+        return customer.get().getWallet();
+    }
+
+    @Override
+    public ListOrderDto showOrderStatusOrder(String customerUsername, String status) {
+        Customer customer = findByUsername(customerUsername).get();
+
+        StatusOrder statusOrder = null;
+        if (status.equals("ExpertSelection")) {
+            statusOrder = StatusOrder.ExpertSelection;
+        } else if (status.equals("ExpertSuggestions")) {
+            statusOrder = StatusOrder.ExpertSuggestions;
+        } else if (status.equals("ComingTowardsYou")) {
+            statusOrder = StatusOrder.ComingTowardsYou;
+        } else if (status.equals("Started")) {
+            statusOrder = StatusOrder.Started;
+        } else if (status.equals("Done")) {
+            statusOrder = StatusOrder.Done;
+        } else if (status.equals("Payment")) {
+            statusOrder = StatusOrder.Payment;
+        } else {
+            throw new InputeException("You entered the status name incorrectly!");
+        }
+
+        List<OrderDto> orderDtoList = new ArrayList<>();
+        List<Order> orderList = orderServiceImpl.findByCustomerAndStatusOrder(customer, statusOrder);
+        for (Order order : orderList) {
+            OrderDto convert = orderMapper.convert(order);
+            orderDtoList.add(convert);
+        }
+        return new ListOrderDto(orderDtoList);
     }
 }
 

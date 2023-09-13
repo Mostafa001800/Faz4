@@ -23,7 +23,7 @@ public class SubService extends BaseEntity<Long> {
     List<Order> orders=new ArrayList<>();
     double basePrice;
     String title;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     List<Expert> experts=new ArrayList<>();
     @Override
     public String toString() {

@@ -2,37 +2,78 @@ package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
 import com.example.faz3.dto.*;
+import com.example.faz3.dto.expert.ExpertDto;
 import com.example.faz3.dto.manager.ServiceDto;
 import com.example.faz3.dto.manager.SubServiceDto;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusExpert;
+import com.example.faz3.entity.enu.UserRole;
 import com.example.faz3.exception.*;
 import com.example.faz3.filter.CustomerFilter;
 import com.example.faz3.filter.ExpertFilter;
+import com.example.faz3.mapper.CustomerMapper;
+import com.example.faz3.mapper.ExpertMapper;
+import com.example.faz3.mapper.ManagerMapper;
 import com.example.faz3.mapper.RequestExpertMapper;
 import com.example.faz3.repository.ManagerRepository;
+import com.example.faz3.security.tokan.ConfigurationToken;
+import com.example.faz3.security.tokan.ConfigurationTokenService;
 import com.example.faz3.service.CustomerService;
+import com.example.faz3.service.EmailService;
 import com.example.faz3.service.ManagerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class ManagerServiceImpl implements ManagerService {
     private final ManagerRepository repository;
+    private final PasswordEncoder passwordEncoder;
     private final SubServiceServiceImpl subServiceServiceImpl;
     private final ServiceServiceImpl serviceServiceImpl;
     private final ExpertServiceImpl expertServiceImpl;
     private final CustomerService customerService;
+    private final ConfigurationTokenService configurationTokenService;
+    private final EmailService emailService;
     private final RequestExpertServiceImpl requestExpertServiceImpl;
     RequestExpertMapper requestExpertMapper = new RequestExpertMapper();
     CustomerFilter customerFilter = new CustomerFilter();
-    ExpertFilter expertFilter=new ExpertFilter();
+    ExpertFilter expertFilter = new ExpertFilter();
+    ManagerMapper managerMapper = new ManagerMapper();
+    CustomerMapper customerMapper=new CustomerMapper();
+    ExpertMapper expertMapper=new ExpertMapper();
+
+
+    @Override
+    public void singup(ManagerDto managerDto) {
+        Optional<Manager> manager = findByEmail(managerDto.getEmail());
+        if (manager.isPresent()) {
+            throw new SaveException("This email is already registered");
+        }
+        Manager manager1 = managerMapper.convert(managerDto);
+        manager1.setPassword(passwordEncoder.encode(managerDto.getPassword()));
+        repository.save(manager1);
+
+        String newToken = UUID.randomUUID().toString();
+        ConfigurationToken configurationToken = new ConfigurationToken(LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), manager1);
+        configurationToken.setToken(newToken);
+
+        configurationTokenService.saveConfigurationToken(configurationToken);
+        SimpleMailMessage mailMessage =
+                emailService.createEmail(manager1.getEmail(),
+                        configurationToken.getToken(), UserRole.MANAGER);
+        emailService.sendEmail(mailMessage);
+
+    }
 
     @Override
     @Transactional
@@ -51,21 +92,21 @@ public class ManagerServiceImpl implements ManagerService {
 
         Expert expert = expertServiceImpl.findByUsername(expertUsername).get();
         List<SubService> subServices = expert.getSubServices();
-        SubService subService=subServiceServiceImpl.findByTitle(titleSubService).get();
+        SubService subService = subServiceServiceImpl.findByTitle(titleSubService).get();
         System.out.println("-----------------------------");
-        System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
+        System.out.println(expert.getSubServices() + " " + expert.getSubServices().size());
         System.out.println("-----------------------------");
-        for (int i=0;i<subServices.size();i++){
-            if(subServices.get(i).getTitle().equals(titleSubService)){
+        for (int i = 0; i < subServices.size(); i++) {
+            if (subServices.get(i).getTitle().equals(titleSubService)) {
                 subServices.remove(i);
                 subService.getExperts().remove(i);
             }
         }
-        System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
+        System.out.println(expert.getSubServices() + " " + expert.getSubServices().size());
         expert.setSubServices(subServices);
         expertServiceImpl.update(expert);
         System.out.println("-----------------------------");
-        System.out.println(expert.getSubServices()+" "+expert.getSubServices().size());
+        System.out.println(expert.getSubServices() + " " + expert.getSubServices().size());
         System.out.println("-----------------------------");
     }
 
@@ -203,9 +244,38 @@ public class ManagerServiceImpl implements ManagerService {
             return customerFilter.filter(customerList, filterDto);
         } else if (filterDto.getFilterEnum().equals(FilterEnum.Expert)) {
             List<Expert> expertList = expertServiceImpl.findAll();
-            return expertFilter.filter(expertList,filterDto);
+            return expertFilter.filter(expertList, filterDto);
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Optional<Manager> findByEmail(String email) {
+        Optional<Manager> manager = repository.findByEmail(email);
+        return manager;
+    }
+
+    @Override
+    public ListCustomerDto filterOrderCustomer() {
+        List<CustomerDto> customerDtoList=new ArrayList<>();
+        List<Customer> customerList = customerFilter.filterByOrder(customerService.finAll());
+        for (Customer customer : customerList){
+            CustomerDto convert = customerMapper.convert(customer);
+            customerDtoList.add(convert);
+        }
+        return new ListCustomerDto(customerDtoList);
+    }
+
+    @Override
+    public ListExpertDto filterOrderExpert() {
+        List<ExpertDto> list=new ArrayList<>();
+        List<Expert> expertList=new ArrayList<>();
+        List<Expert> expertList1=expertFilter.filterByOrder(expertServiceImpl.findAll());
+        for (Expert expert:expertList1){
+            ExpertDto convert = expertMapper.convert(expert);
+            list.add(convert);
+        }
+        return new ListExpertDto(list);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.faz3.controller;
 
+import com.example.faz3.base.domain.Person;
 import com.example.faz3.dto.ListOrderDto;
 import com.example.faz3.dto.RequestExpertDto;
 import com.example.faz3.dto.SuggestionDto;
@@ -9,6 +10,8 @@ import com.example.faz3.entity.Order;
 import com.example.faz3.entity.SubService;
 import com.example.faz3.service.ExpertService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,19 +22,20 @@ import java.util.List;
 public class ExpertController {
     private final ExpertService expertService;
 
-    @PostMapping("/singup")
-    public void singUp(@RequestBody ExpertDto expertDto) {
-        expertService.singUp(expertDto);
+    @PostMapping("/request-expert/{subServiceName}")
+    public void requestExpert(@PathVariable String subServiceName) {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Person person=(Person) authentication.getPrincipal();
+        RequestExpertDto expertDto=new RequestExpertDto(person.getUsername(),subServiceName);
+        expertService.requestExpert(expertDto);
     }
 
-    @PostMapping("/request-expert")
-    public void requestExpert(@RequestBody RequestExpertDto requestExpertDto) {
-        expertService.requestExpert(requestExpertDto);
-    }
+    @GetMapping("/my-work")
+    public ListOrderDto works() {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Person person=(Person) authentication.getPrincipal();
 
-    @GetMapping("/my-work/{expertUsername}")
-    public ListOrderDto works(@PathVariable String expertUsername) {
-        Expert expert = expertService.findByUsername(expertUsername).get();
+        Expert expert = expertService.findByUsername(person.getUsername()).get();
         ListOrderDto works = expertService.works(expert);
         return works;
     }
@@ -49,8 +53,11 @@ public class ExpertController {
         return expert.getSubServices();
     }
 
-    @GetMapping("/showScore/{expertUsername}")
-    public double showScore(@PathVariable String expertUsername) {
-        return expertService.showScore(expertUsername);
+    @GetMapping("/showScore")
+    public double showScore() {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        Person person=(Person) authentication.getPrincipal();
+
+        return expertService.showScore(person.getUsername());
     }
 }

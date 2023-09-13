@@ -16,6 +16,7 @@ public interface ExpertService {
     ListOrderDto works(Expert expert);
     void chanelPassword(Expert expert, String pass);
     void singUp(ExpertDto expertDto);
+    void newSingUp(ExpertDto expertDto);
     void saveImage(Expert expert, String location);
     void registerTheOffer(SuggestionDto suggestionDto);
     void requestExpert(RequestExpertDto requestExpertDto);
@@ -26,6 +27,7 @@ public interface ExpertService {
     void updateScore(Comment comment);
     double showScore(String expertUsername);
     List<Expert> findAll();
+    Optional<Expert> findByEmail(String email);
 
 
 

@@ -2,11 +2,14 @@ package com.example.faz3.filter;
 
 import com.example.faz3.dto.FilterDto;
 import com.example.faz3.dto.ListFilterDto;
+import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Expert;
 import com.example.faz3.entity.SubService;
 import com.example.faz3.mapper.FilterDtoMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ExpertFilter {
@@ -96,5 +99,15 @@ public class ExpertFilter {
             }
         }
         return list;
+    }
+
+    public List<Expert> filterByOrder(List<Expert> experts){
+        Collections.sort(experts, new Comparator<Expert>() {
+            @Override
+            public int compare(Expert o1, Expert o2) {
+                return o2.getOrders().size() - o1.getOrders().size();
+            }
+        });
+        return experts;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.faz3.service.impl;
 
+import com.example.faz3.entity.Customer;
 import com.example.faz3.entity.Order;
+import com.example.faz3.entity.enu.StatusOrder;
 import com.example.faz3.repository.OrderRepository;
 import com.example.faz3.service.OrderService;
 import jakarta.transaction.Transactional;
@@ -40,5 +42,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void update(Order order) {
         repository.save(order);
+    }
+
+    @Override
+    public List<Order> findByCustomerAndStatusOrder(Customer customer, StatusOrder statusOrder) {
+        List<Order> orders = repository.findByCustomerAndStatusOrder(customer, statusOrder);
+        return orders;
     }
 }
