@@ -1,10 +1,7 @@
 package com.example.faz3.service.impl;
 
 import com.example.faz3.Validation.Validation;
-import com.example.faz3.dto.ListOrderDto;
-import com.example.faz3.dto.OrderDto;
-import com.example.faz3.dto.RequestExpertDto;
-import com.example.faz3.dto.SuggestionDto;
+import com.example.faz3.dto.*;
 import com.example.faz3.dto.expert.ExpertDto;
 import com.example.faz3.entity.*;
 import com.example.faz3.entity.enu.StatusOrder;
@@ -17,6 +14,7 @@ import com.example.faz3.repository.ExpertRepository;
 import com.example.faz3.security.tokan.ConfigurationToken;
 import com.example.faz3.security.tokan.ConfigurationTokenService;
 import com.example.faz3.service.*;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -228,14 +226,29 @@ public class ExpertServiceImpl implements ExpertService {
         configurationToken.setToken(newToken);
 
         configurationTokenService.saveConfigurationToken(configurationToken);
-        SimpleMailMessage mailMessage=
+        SimpleMailMessage mailMessage =
                 emailService.createEmail(expert.getEmail(),
-                        configurationToken.getToken(),UserRole.EXPERT);
+                        configurationToken.getToken(), UserRole.EXPERT);
         emailService.sendEmail(mailMessage);
     }
 
     @Override
     public Optional<Expert> findByEmail(String email) {
         return Optional.empty();
+    }
+
+    public List<Expert> findAll(FilterDto filterDto) {
+        return repository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> list = new ArrayList<>();
+            if (filterDto.getUsername() != null) {
+                list.add(
+                        criteriaBuilder.equal(
+                                root.get("username"), filterDto.getUsername()
+                        ));
+            }
+
+            return criteriaBuilder.and(list.toArray(list.toArray(new Predicate[0])));
+
+        });
     }
 }
