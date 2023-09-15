@@ -33,7 +33,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final ExpertServiceImpl expertServiceImpl;
     private final SubServiceService subServiceService;
     private final SuggestionService suggestionService;
-    private final CommentService commentService;
+    private final CommentServiceImpl commentServiceImpl;
     private final EmailService emailService;
     CustomerMapper customerMapper = new CustomerMapper();
     OrderMapper orderMapper = new OrderMapper();
@@ -336,7 +336,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new WrongException("* The order is not in proper condition *");
         }
         comment.setOrder(order.get());
-        commentService.save(comment);
+        commentServiceImpl.save(comment);
         expertServiceImpl.updateScore(comment);
 
 
@@ -359,6 +359,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setPassword(passwordEncoder.encode(customerDto.getPassword()));
             repository.save(customer);
         }
+
         String newToken = UUID.randomUUID().toString();
         ConfigurationToken configurationToken = new ConfigurationToken(LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), customer);
         configurationToken.setToken(newToken);
@@ -372,10 +373,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public double showWallet(String customerUsername) {
         Optional<Customer> customer = findByUsername(customerUsername);
-        System.out.println("---------------------");
-        System.out.println(customerUsername);
-        System.out.println("---------------------");
-
         return customer.get().getWallet();
     }
 
