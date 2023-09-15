@@ -244,6 +244,8 @@ public class ManagerServiceImpl implements ManagerService {
             List<Customer> customerList = customerService.finAll();
             return customerFilter.filter(customerList, filterDto);
         } else if (filterDto.getFilterEnum().equals(FilterEnum.Expert)) {
+
+
             List<Expert> expertList = expertServiceImpl.findAll();
             return expertFilter.filter(expertList, filterDto);
         } else {
