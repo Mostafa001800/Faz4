@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface ExpertRepository extends JpaSpecificationExecutor<Expert>,JpaRepository<Expert,Long> {
     Optional<Expert> findByUsername(String user);
     Optional<Expert> findByEmail(String email);
-    @Query("SELECT e,(select count(o.id) from orders o where o.status_order='Done'and o.expert_id=e.id) as order_count FROM expert e order by order_count")
-    Object findExpertByCountWorks();
+//    @Query("SELECT e,(select count(o.id) from orders o where o.status_order='Done'and o.expert_id=e.id) as order_count FROM expert e order by order_count")
+//    Object findExpertByCountWorks();
 
 }
