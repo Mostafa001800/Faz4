@@ -14,4 +14,9 @@ public class GlobalExceptionHandler {
         String response =e.getMessage();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity serviceExistHandler(IllegalStateException e){
+        String response=e.getMessage();
+        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    }
 }
